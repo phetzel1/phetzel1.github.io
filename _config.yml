@@ -11,7 +11,7 @@ title:            Phillip Hetzel
 tagline:          'Data Addict, Late-Blooming Coder, Hot Sauce Enthusiast'
 description:      'Please poke around this website to get a feel for my work!'
 url:              phetzel1.github.io
-baseurl:          /
+baseurl:          
 
 sass:
     sass_dir:     _sass
