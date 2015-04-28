@@ -1,0 +1,32 @@
+# Dependencies
+markdown:         redcarpet
+highligher:       pygments
+encoding: utf-8
+# Permalinks
+permalink:        pretty
+relative_permalinks: true
+
+# Setup
+title:            Phillip Hetzel
+tagline:          'Data Addict, Late-Blooming Coder, Hot Sauce Enthusiast'
+description:      'Please poke around this website to get a feel for my work!'
+url:              phetzel1.github.io
+baseurl:          /
+
+sass:
+    sass_dir:     _sass
+
+
+author:
+  name:           'Phillip Hetzel'
+  url:            https://twitter.com/PJPretzel
+
+
+
+github:
+  repo:           https://github.com/phetzel1
+
+linkedin:         www.linkedin.com/in/philliphetzel
+
+
+categories:  [projects, posts]

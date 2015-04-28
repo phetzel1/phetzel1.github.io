@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Election &middot; Phillip Hetzel
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="//public/css/poole.css">
+  <link rel="stylesheet" href="//public/css/syntax.css">
+  <link rel="stylesheet" href="//public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="phetzel1.github.iopublic/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="phetzel1.github.iopublic/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+</head>
+
+
+  <body class = 'theme-base-08'>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="/">
+          Phillip Hetzel
+        </a>
+      </h1>
+      <p class="lead">Please poke around this website to get a feel for my work!</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">Home</a>
+
+      
+
+      
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/about/">About Me</a>
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/posts/">Blog Posts</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/projects/">Projects</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/resources/">Resources</a>
+          
+        
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/phetzel1">GitHub project</a>
+
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+  <h1 class="post-title">Election</h1>
+  <span class="post-date">27 Apr 2015</span>
+  <h1>FEC Data</h1>
+
+<p>Phillip Hetzel<br>
+April 23, 2015  </p>
+
+<h2>Objective</h2>
+
+<p>I&#39;ve always been fascinated (and frustrated) with the state of campaign finance in the United States of America.  It&#39;s because of this fascination that I&#39;ve turned my attention to the Federal Election Commissions Open Government policy to view the &quot;trackable&quot; donations that candidates are receiving.  I say trackable donations because a great deal of money does not have to be disclosed in an easy to track fashion.</p>
+
+<p>The general purpose of this project is to answer two questions:</p>
+
+<ul>
+<li>Which companies give the most money over time?</li>
+<li>Which political direction companies are likely to donate?</li>
+<li>Which candidates are receiving the most money over time?</li>
+</ul>
+
+<h2>The Data</h2>
+
+<p>Here are some descriptions of the tables we will download.  They are set up to be relational.</p>
+
+<p>|Name                        |Description                                                                                                                                                                                                                                                                                                                                                          |Data.frame |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
+|Commitees                   |The committee master file contains one record for each committee registered with the Federal Election Commission. This includes federal political action committees and party committees, campaign committees for presidential, house and senate candidates, as well as groups or organizations who are spending money for or against candidates for federal office. |committee  |
+|Candidates                  |The candidate master file contains one record for each candidate who has either registered with the Federal Election Commission or appeared on a ballot list prepared by a state elections office.                                                                                                                                                                   |candidates |
+|Linkages                    |This file contains one record for each candidate to committee linakge.                                                                                                                                                                                                                                                                                               |linkage    |
+|Itemized Records            |The itemized records (miscellaneous transactions) file contains all transactions (contributions, transfers, etc. among federal committees).                                                                                                                                                                                                                          |cm2cm      |
+|Contributions to Candidates |The itemized committee contributions file contains each contribution or independent expenditure made by a PAC, party committee, candidate committee, or other federal committee to a candidate during the two-year election cycle.                                                                                                                                   |cm2cand    |
+|Individual Contributions    |The individual contributions file contains each contribution from an individual to a federal committee if the contribution was at least $200.                                                                                                                                                                                                                        |indiv2cm   |</p>
+
+<h2>Let&#39;s Get Coding</h2>
+
+<h3>Set Up</h3>
+
+<p>I want to set myself up for success, so I immediately load up some of my favorite packages for data munging.  I also set my working directory and clear my memory.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>dplyr<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>ggplot2<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>reshape2<span class="p">)</span>
+<span class="kp">setwd</span><span class="p">(</span><span class="s">&quot;~/R Working Directory/Election_Data&quot;</span><span class="p">)</span>
+<span class="kp">rm</span><span class="p">(</span><span class="kt">list</span><span class="o">=</span><span class="kp">ls</span><span class="p">())</span>
+</code></pre></div>
+<p>In order to find out the answers to these questions, we can download the data from the <a href="http://www.fec.gov/finance/disclosure/ftpdet.shtml#a2015_2016">Federal Election Commission</a>.  I want to write as little code as possible, so I store the specific links to loop through later.  I am downloading two files for each FEC table: a header file (in .csv format) and the actual data (in a zip file).</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Create a vector with the links leading to CSV files that hold the column names</span>
+nameLinks <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;http://www.fec.gov/finance/disclosure/metadata/cn_header_file.csv&quot;</span><span class="p">,</span> 
+              <span class="s">&quot;http://www.fec.gov/finance/disclosure/metadata/indiv_header_file.csv&quot;</span><span class="p">,</span> 
+              <span class="s">&quot;http://www.fec.gov/finance/disclosure/metadata/pas2_header_file.csv&quot;</span><span class="p">,</span> 
+              <span class="s">&quot;http://www.fec.gov/finance/disclosure/metadata/cm_header_file.csv&quot;</span><span class="p">,</span> 
+              <span class="s">&quot;http://www.fec.gov/finance/disclosure/metadata/ccl_header_file.csv&quot;</span><span class="p">,</span>
+              <span class="s">&quot;http://www.fec.gov/finance/disclosure/metadata/oth_header_file.csv&quot;</span><span class="p">)</span>
+
+<span class="c1">#Create a vector with the links leading to the 6 data frames</span>
+datLinks <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&quot;ftp://ftp.fec.gov/FEC/2016/cn16.zip&quot;</span><span class="p">,</span>
+              <span class="s">&quot;ftp://ftp.fec.gov/FEC/2016/indiv16.zip&quot;</span><span class="p">,</span>
+              <span class="s">&quot;ftp://ftp.fec.gov/FEC/2016/pas216.zip&quot;</span><span class="p">,</span>
+              <span class="s">&quot;ftp://ftp.fec.gov/FEC/2016/cm16.zip&quot;</span><span class="p">,</span>
+              <span class="s">&quot;ftp://ftp.fec.gov/FEC/2016/ccl16.zip&quot;</span><span class="p">,</span>
+              <span class="s">&quot;ftp://ftp.fec.gov/FEC/2016/oth16.zip&quot;</span><span class="p">)</span>
+
+<span class="c1">#Create a vector with the file names of each of the tables</span>
+fileName <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;cn.txt&#39;</span><span class="p">,</span>
+              <span class="s">&#39;itcont.txt&#39;</span><span class="p">,</span>
+              <span class="s">&#39;itpas2.txt&#39;</span><span class="p">,</span>
+              <span class="s">&#39;cm.txt&#39;</span><span class="p">,</span>
+              <span class="s">&#39;ccl.txt&#39;</span><span class="p">,</span>
+              <span class="s">&#39;itoth.txt&#39;</span><span class="p">)</span>
+</code></pre></div>
+<p>FEC&#39;s site gives the columns and associated data types, so I create vectors with the those types to pass into the loop.  This will ensure that nothing gets misread.  I also create a list of 6 empty data frames to import the data into.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Create vectors describing the class of each column in each table</span>
+candClasses <span class="o">&lt;-</span> <span class="kp">rep</span><span class="p">(</span><span class="s">&#39;character&#39;</span><span class="p">,</span> <span class="m">15</span><span class="p">)</span>
+indColClasses <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="kp">rep</span><span class="p">(</span><span class="s">&quot;character&quot;</span><span class="p">,</span> <span class="m">14</span><span class="p">),</span> <span class="s">&quot;numeric&quot;</span><span class="p">,</span> <span class="kp">rep</span><span class="p">(</span><span class="s">&quot;character&quot;</span><span class="p">,</span><span class="m">6</span><span class="p">))</span>
+comContrClasses <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="kp">rep</span><span class="p">(</span><span class="s">&#39;character&#39;</span><span class="p">,</span> <span class="m">14</span><span class="p">),</span> <span class="s">&#39;numeric&#39;</span><span class="p">,</span> <span class="kp">rep</span><span class="p">(</span><span class="s">&#39;character&#39;</span><span class="p">,</span> <span class="m">7</span><span class="p">))</span>
+comClasses <span class="o">&lt;-</span> <span class="kp">rep</span><span class="p">(</span><span class="s">&#39;character&#39;</span><span class="p">,</span> <span class="m">15</span><span class="p">)</span>
+linkageClasses <span class="o">&lt;-</span> <span class="kp">rep</span><span class="p">(</span><span class="s">&#39;character&#39;</span><span class="p">,</span> <span class="m">7</span><span class="p">)</span>
+cm2cmClasses <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="kp">rep</span><span class="p">(</span><span class="s">&#39;character&#39;</span><span class="p">,</span> <span class="m">14</span><span class="p">),</span> <span class="s">&#39;numeric&#39;</span><span class="p">,</span> <span class="kp">rep</span><span class="p">(</span><span class="s">&#39;character&#39;</span><span class="p">,</span> <span class="m">6</span><span class="p">))</span>
+
+<span class="c1">#Place these vectors in a list in preparation for a loop</span>
+iterClasses <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span>candClasses<span class="p">,</span> indColClasses<span class="p">,</span> comContrClasses<span class="p">,</span> comClasses<span class="p">,</span> linkageClasses<span class="p">,</span> cm2cmClasses<span class="p">)</span>
+
+<span class="c1">#Create a list of 6 blank data frames in preparation for a loop</span>
+frames <span class="o">&lt;-</span> <span class="kt">list</span><span class="p">(</span><span class="kp">rep</span><span class="p">(</span><span class="kt">data.frame</span><span class="p">(),</span><span class="m">6</span><span class="p">))</span>
+</code></pre></div>
+<h3>Getting the Data</h3>
+
+<p>Now it&#39;s time for the loop.  The basic structure of the loop is as follows</p>
+
+<ol>
+<li>Initialize a temporary file</li>
+<li>Download the header file from the nameLinks vector and place into the first temp file</li>
+<li>Initialize a second temp file</li>
+<li>Download the data table referenced by the fileName vector and use the iterClasses vector to define column types.  Unzip and place the table into the list of data frames</li>
+<li>Define the names of the new data frame as the data in the tempNames file</li>
+<li>Detach the temp files</li>
+</ol>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kr">for</span> <span class="p">(</span>i <span class="kr">in</span> <span class="m">1</span><span class="o">:</span><span class="kp">length</span><span class="p">(</span>nameLinks<span class="p">)){</span>
+    tempNames <span class="o">&lt;-</span> <span class="kp">tempfile</span><span class="p">()</span>
+    download.file<span class="p">(</span>nameLinks<span class="p">[</span>i<span class="p">],</span> tempNames<span class="p">,</span> method <span class="o">=</span> <span class="s">&quot;curl&quot;</span><span class="p">)</span>
+    temp <span class="o">&lt;-</span> <span class="kp">tempfile</span><span class="p">()</span>
+    download.file<span class="p">(</span>datLinks<span class="p">[</span>i<span class="p">],</span> temp<span class="p">,</span> method <span class="o">=</span> <span class="s">&quot;curl&quot;</span><span class="p">)</span>
+    frames<span class="p">[[</span>i<span class="p">]]</span> <span class="o">&lt;-</span> read.table<span class="p">(</span><span class="kp">unz</span><span class="p">(</span>temp<span class="p">,</span>fileName<span class="p">[</span>i<span class="p">]),</span>header <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> sep <span class="o">=</span> <span class="s">&quot;|&quot;</span><span class="p">,</span>comment.char <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">,</span>stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">,</span>
+                       colClasses <span class="o">=</span> <span class="kp">unlist</span><span class="p">(</span>iterClasses<span class="p">[</span>i<span class="p">]),</span> quote <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="kp">names</span><span class="p">(</span>frames<span class="p">[[</span>i<span class="p">]])</span> <span class="o">&lt;-</span> read.csv<span class="p">(</span>tempNames<span class="p">,</span>header <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> stringsAsFactor <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
+    <span class="kp">unlink</span><span class="p">(</span>temp<span class="p">)</span>
+    <span class="kp">unlink</span><span class="p">(</span>tempNames<span class="p">)</span>
+    <span class="kp">remove</span><span class="p">(</span>temp<span class="p">,</span>tempNames<span class="p">)</span>
+<span class="p">}</span>
+</code></pre></div>
+<p>By the time this is over, you should have a list with 6 full data frames.  The next step is to extract the dataframes into variables we can remember.  After the data frames have been moved into separate variables, we can clean up our memory.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Place the items in the frames list into specific variables</span>
+<span class="c1">#Delete the list items as they are used to save memory</span>
+candidates <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>frames<span class="p">[[</span><span class="m">1</span><span class="p">]])</span>
+frames<span class="p">[[</span><span class="m">1</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+indiv2cm <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>frames<span class="p">[[</span><span class="m">1</span><span class="p">]])</span>
+frames<span class="p">[[</span><span class="m">1</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+cm2cand <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>frames<span class="p">[[</span><span class="m">1</span><span class="p">]])</span>
+frames<span class="p">[[</span><span class="m">1</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+committee <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>frames<span class="p">[[</span><span class="m">1</span><span class="p">]])</span>
+frames<span class="p">[[</span><span class="m">1</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+linkage <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>frames<span class="p">[[</span><span class="m">1</span><span class="p">]])</span>
+frames<span class="p">[[</span><span class="m">1</span><span class="p">]]</span> <span class="o">&lt;-</span> <span class="kc">NULL</span>
+cm2cm <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span>frames<span class="p">[[</span><span class="m">1</span><span class="p">]])</span>
+
+<span class="c1">#Remove variables not being used</span>
+<span class="kp">remove</span><span class="p">(</span>frames<span class="p">,</span> candClasses<span class="p">,</span> cm2cmClasses<span class="p">,</span> comClasses<span class="p">,</span> comContrClasses<span class="p">,</span> datLinks<span class="p">,</span> fileName<span class="p">,</span> 
+       i<span class="p">,</span> indColClasses<span class="p">,</span> iterClasses<span class="p">,</span> linkageClasses<span class="p">,</span> nameLinks<span class="p">)</span>
+</code></pre></div>
+<h3>Transforming the Data</h3>
+
+<p>Since we&#39;ll be doing some time series analysis, we can convert any data fields into the proper format.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Change to date type where applicable</span>
+indiv2cm<span class="o">$</span>TRANSACTION_DT <span class="o">&lt;-</span> <span class="kp">as.Date</span><span class="p">(</span>indiv2cm<span class="o">$</span>TRANSACTION_DT<span class="p">,</span>format <span class="o">=</span> <span class="s">&quot;%m%d%Y&quot;</span><span class="p">)</span>
+cm2cand<span class="o">$</span>TRANSACTION_DT <span class="o">&lt;-</span> <span class="kp">as.Date</span><span class="p">(</span>cm2cand<span class="o">$</span>TRANSACTION_DT<span class="p">,</span> format <span class="o">=</span> <span class="s">&#39;%m%d%Y&#39;</span><span class="p">)</span>
+cm2cm<span class="o">$</span>TRANSACTION_DT <span class="o">&lt;-</span> <span class="kp">as.Date</span><span class="p">(</span>cm2cm<span class="o">$</span>TRANSACTION_DT<span class="p">,</span> format <span class="o">=</span> <span class="s">&#39;%m%d%Y&#39;</span><span class="p">)</span>
+</code></pre></div>
+<p>This is where it gets a little tricky.  My first goal is to see how much money a PAC has spent or received on any given day.  That means I need to have a row for every day per every PAC.  The code below makes a new data frame (cmSmall), which is the committee data frame with less variables.  We then create a vector, days, which will have a day for every day so far this year.  We then create a data frame with every day this year, for every PAC.  We can then join the cmSmall data frame to add in relevent variables</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">cmSmall <span class="o">&lt;-</span> select<span class="p">(</span>committee<span class="p">,</span> CMTE_ID<span class="p">,</span> CMTE_NM<span class="p">,</span> CMTE_PTY_AFFILIATION<span class="p">,</span>ORG_TP<span class="p">)</span>
+
+days <span class="o">&lt;-</span> <span class="kp">seq</span><span class="p">(</span><span class="kp">as.Date</span><span class="p">(</span><span class="s">&#39;2015-01-01&#39;</span><span class="p">),</span> <span class="kp">as.Date</span><span class="p">(</span><span class="kp">Sys.Date</span><span class="p">()),</span> <span class="s">&#39;day&#39;</span><span class="p">)</span>
+cmGrpMoney <span class="o">&lt;-</span> arrange<span class="p">(</span><span class="kp">expand.grid</span><span class="p">(</span>CMTE_ID <span class="o">=</span> cmSmall<span class="o">$</span>CMTE_ID<span class="p">,</span> OnDate <span class="o">=</span> days<span class="p">),</span> CMTE_ID<span class="p">)</span>
+
+cmGrpMoney <span class="o">&lt;-</span> cmGrpMoney <span class="o">%&gt;%</span>
+    left_join<span class="p">(</span>cmSmall<span class="p">,</span> by <span class="o">=</span> <span class="p">(</span><span class="s">&#39;CMTE_ID&#39;</span> <span class="o">=</span> <span class="s">&#39;CMTE_ID&#39;</span><span class="p">))</span>
+</code></pre></div>
+<p>In our data, there are cases where PACs are receiving (or spending) money through multiple transactions a day.  We need to aggregate that data by PAC by day:</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Shows money spent from individuals on PACs</span>
+indivAssets <span class="o">&lt;-</span> indiv2cm <span class="o">%&gt;%</span>
+    group_by<span class="p">(</span>CMTE_ID<span class="p">,</span> TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    arrange<span class="p">(</span>TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>IndSum <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>TRANSACTION_AMT<span class="p">))</span>
+
+<span class="c1">#Shows how much a committee has spent on other committees</span>
+cm2cmLiabilities <span class="o">&lt;-</span> cm2cm <span class="o">%&gt;%</span>
+    group_by<span class="p">(</span>CMTE_ID<span class="p">,</span> TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    arrange<span class="p">(</span>TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>Liabilities <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>TRANSACTION_AMT<span class="p">))</span> <span class="o">%&gt;%</span>
+    select<span class="p">(</span>CMTE_ID<span class="p">,</span>TRANSACTION_DT<span class="p">,</span> Liabilities<span class="p">)</span>
+
+<span class="c1">#Shows how much a commmittee has received from other committees</span>
+cm2cmAssets <span class="o">&lt;-</span> cm2cm <span class="o">%&gt;%</span>
+    group_by<span class="p">(</span>OTHER_ID<span class="p">,</span> TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    arrange<span class="p">(</span>TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>Assets <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>TRANSACTION_AMT<span class="p">))</span> <span class="o">%&gt;%</span>
+    select<span class="p">(</span>OTHER_ID<span class="p">,</span>TRANSACTION_DT<span class="p">,</span> Assets<span class="p">)</span>
+
+<span class="c1">#Shows how much a committee has spent on candidates</span>
+cm2candLiabilities <span class="o">&lt;-</span> cm2cand <span class="o">%&gt;%</span>
+    group_by<span class="p">(</span>CMTE_ID<span class="p">,</span> TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    arrange<span class="p">(</span>TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>ToCand<span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>TRANSACTION_AMT<span class="p">))</span> <span class="o">%&gt;%</span>
+    select<span class="p">(</span>CMTE_ID<span class="p">,</span>TRANSACTION_DT<span class="p">,</span> ToCand<span class="p">)</span>
+
+<span class="c1">#Shows how much a candidate committee has received from other committees (should be 0)</span>
+cm2candAssets <span class="o">&lt;-</span> cm2cand <span class="o">%&gt;%</span>
+    group_by<span class="p">(</span>OTHER_ID<span class="p">,</span> TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    arrange<span class="p">(</span>TRANSACTION_DT<span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>CandReceived <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>TRANSACTION_AMT<span class="p">))</span> <span class="o">%&gt;%</span>
+    select<span class="p">(</span>OTHER_ID<span class="p">,</span>TRANSACTION_DT<span class="p">,</span> CandReceived<span class="p">)</span>
+</code></pre></div>
+<h3>Bringing It All Together</h3>
+
+<p>It&#39;s time to combine all of these assets and liabilities into one table.  Hadley Wickham&#39;s dplyr (also used above) makes this process simple.  We also want to make all NA values zero (that came as a result of the left join).</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="c1">#Join the Asset and Liability data frames to the master group</span>
+cmGrpMoney <span class="o">&lt;-</span> cmGrpMoney <span class="o">%&gt;%</span>
+    left_join<span class="p">(</span>indivAssets<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;CMTE_ID&#39;</span> <span class="o">=</span> <span class="s">&#39;CMTE_ID&#39;</span><span class="p">,</span> <span class="s">&#39;OnDate&#39;</span> <span class="o">=</span> <span class="s">&#39;TRANSACTION_DT&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    left_join<span class="p">(</span>cm2cmAssets<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;CMTE_ID&#39;</span> <span class="o">=</span> <span class="s">&#39;OTHER_ID&#39;</span><span class="p">,</span> <span class="s">&#39;OnDate&#39;</span> <span class="o">=</span> <span class="s">&#39;TRANSACTION_DT&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    left_join<span class="p">(</span>cm2cmLiabilities<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;CMTE_ID&#39;</span> <span class="o">=</span> <span class="s">&#39;CMTE_ID&#39;</span><span class="p">,</span> <span class="s">&#39;OnDate&#39;</span> <span class="o">=</span> <span class="s">&#39;TRANSACTION_DT&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    left_join<span class="p">(</span>cm2candLiabilities<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;CMTE_ID&#39;</span> <span class="o">=</span> <span class="s">&#39;CMTE_ID&#39;</span><span class="p">,</span> <span class="s">&#39;OnDate&#39;</span> <span class="o">=</span> <span class="s">&#39;TRANSACTION_DT&#39;</span><span class="p">))</span> <span class="o">%&gt;%</span>
+    left_join<span class="p">(</span>cm2candAssets<span class="p">,</span> by <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;CMTE_ID&#39;</span> <span class="o">=</span> <span class="s">&#39;OTHER_ID&#39;</span><span class="p">,</span> <span class="s">&#39;OnDate&#39;</span> <span class="o">=</span> <span class="s">&#39;TRANSACTION_DT&#39;</span><span class="p">))</span>
+
+
+<span class="c1">#Replace NAs induced by the join to 0</span>
+cmGrpMoney<span class="p">[</span><span class="kp">is.na</span><span class="p">(</span>cmGrpMoney<span class="p">)]</span> <span class="o">&lt;-</span> <span class="m">0</span>
+</code></pre></div>
+<p>We want to view total assets and total liabilities over time.  This is why were are using the cumulative sum function, then adding together the asset columns and liability columns, separately.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">cmGrpMoney <span class="o">&lt;-</span> cmGrpMoney <span class="o">%&gt;%</span>
+    group_by<span class="p">(</span>CMTE_ID<span class="p">)</span> <span class="o">%&gt;%</span>
+    mutate<span class="p">(</span>FromCommittees <span class="o">=</span> <span class="kp">cumsum</span><span class="p">(</span>Assets<span class="p">),</span> ReceivedCandidates <span class="o">=</span> <span class="kp">cumsum</span><span class="p">(</span>CandReceived<span class="p">),</span>
+           Funds <span class="o">=</span> <span class="kp">cumsum</span><span class="p">(</span>IndSum<span class="p">),</span> SpentCommittees <span class="o">=</span> <span class="kp">cumsum</span><span class="p">(</span>Liabilities<span class="p">),</span> SpentCandidates <span class="o">=</span> <span class="kp">cumsum</span><span class="p">(</span>ToCand<span class="p">),</span> 
+           TotalRaised <span class="o">=</span> FromCommittees<span class="o">+</span>Funds<span class="o">+</span>ReceivedCandidates<span class="p">,</span> TotalSpent <span class="o">=</span> SpentCommittees<span class="o">+</span>SpentCandidates<span class="p">)</span> <span class="o">%&gt;%</span>
+    select<span class="p">(</span>CMTE_ID<span class="p">,</span> CMTE_NM<span class="p">,</span> OnDate<span class="p">,</span> Funds<span class="p">,</span> FromCommittees<span class="p">,</span> TotalRaised<span class="p">,</span> SpentCommittees<span class="p">,</span> SpentCandidates<span class="p">,</span> TotalSpent<span class="p">)</span>
+</code></pre></div>
+<p>We have a massive dataset right now but how much of it is useful?  In the beginning of the exercise, we made a data frame using all of the listed PACs.  Most of these PACs have not given nor received money yet this year, so we want to filter them out.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">check <span class="o">&lt;-</span> cmGrpMoney <span class="o">%&gt;%</span>
+    group_by<span class="p">(</span>CMTE_ID<span class="p">)</span> <span class="o">%&gt;%</span>
+    summarise<span class="p">(</span>raised <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>TotalRaised<span class="p">),</span> spent <span class="o">=</span> <span class="kp">sum</span><span class="p">(</span>TotalSpent<span class="p">))</span> <span class="o">%&gt;%</span>
+    filter<span class="p">(</span>raised <span class="o">==</span> <span class="m">0</span> <span class="o">&amp;</span> spent <span class="o">==</span> <span class="m">0</span><span class="p">)</span> <span class="o">%&gt;%</span>
+    select<span class="p">(</span>CMTE_ID<span class="p">)</span>
+
+check <span class="o">&lt;-</span> check<span class="o">$</span>CMTE_ID
+
+cmGrpMoney <span class="o">&lt;-</span> cmGrpMoney<span class="p">[(</span><span class="o">!</span>cmGrpMoney<span class="o">$</span>CMTE_ID <span class="o">%in%</span> check<span class="p">),]</span>
+</code></pre></div>
+<h2>Product</h2>
+
+<p>The goal of this work was simply to get the data into the correct format for analysis.  We can plug this new data output into a Shiny application to more dynamically view Assets and Liabilities of PACs over time.  Please go to my <a href="https://phetzel1.shinyapps.io/Election_Data/">Shiny Application</a> and play around.  Start typing in a company name and see how active their PAC is!</p>
+
+<h2>Shiny Code</h2>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">library</span><span class="p">(</span>shiny<span class="p">)</span>
+<span class="kn">require</span><span class="p">(</span>rCharts<span class="p">)</span>
+
+<span class="c1">#ui.R</span>
+shinyUI<span class="p">(</span>fluidPage<span class="p">(</span>
+    titlePanel<span class="p">(</span><span class="s">&#39;PAC Fundraising vs. Spending&#39;</span><span class="p">),</span>
+    sidebarPanel<span class="p">(</span>
+        selectizeInput<span class="p">(</span><span class="s">&#39;committee&#39;</span><span class="p">,</span> choices <span class="o">=</span> <span class="kc">NULL</span><span class="p">,</span> label <span class="o">=</span> <span class="s">&#39;Search for a Committee&#39;</span><span class="p">)</span>
+    <span class="p">),</span>
+    mainPanel<span class="p">(</span>
+        showOutput<span class="p">(</span><span class="s">&quot;raised&quot;</span><span class="p">,</span> <span class="s">&#39;morris&#39;</span><span class="p">)</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1">#server.R</span>
+<span class="kn">library</span><span class="p">(</span>shiny<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>rCharts<span class="p">)</span>
+<span class="kn">library</span><span class="p">(</span>data.table<span class="p">)</span>
+
+cmGrpMoney <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&quot;cmGrpMoney.txt&quot;</span><span class="p">,</span> sep <span class="o">=</span> <span class="s">&#39;|&#39;</span><span class="p">)</span>
+setnames<span class="p">(</span>cmGrpMoney<span class="p">,</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;CMTE_ID&#39;</span><span class="p">,</span> <span class="s">&#39;CMTE_NM&#39;</span><span class="p">,</span> <span class="s">&#39;OnDate&#39;</span><span class="p">,</span> <span class="s">&#39;Funds&#39;</span><span class="p">,</span> <span class="s">&#39;FromCommittees&#39;</span><span class="p">,</span> <span class="s">&#39;TotalRaised&#39;</span><span class="p">,</span> <span class="s">&#39;SpentCommittees&#39;</span><span class="p">,</span> <span class="s">&#39;SpentCandidates&#39;</span><span class="p">,</span> <span class="s">&#39;TotalSpent&#39;</span><span class="p">))</span>
+orgs <span class="o">&lt;-</span> fread<span class="p">(</span><span class="s">&#39;orgs.txt&#39;</span><span class="p">,</span> sep <span class="o">=</span> <span class="s">&#39;\n&#39;</span><span class="p">,</span> header <span class="o">=</span> <span class="bp">F</span><span class="p">)</span><span class="o">$</span>V1
+
+shinyServer<span class="p">(</span><span class="kr">function</span><span class="p">(</span>input<span class="p">,</span> output<span class="p">,</span> session<span class="p">){</span>
+
+    updateSelectizeInput<span class="p">(</span>session<span class="p">,</span> <span class="s">&#39;committee&#39;</span><span class="p">,</span> choices <span class="o">=</span> orgs<span class="p">,</span> server <span class="o">=</span> <span class="bp">T</span><span class="p">,</span> options <span class="o">=</span> <span class="kt">list</span><span class="p">(</span>placeholder <span class="o">=</span> <span class="s">&#39;Start typing!&#39;</span><span class="p">))</span>
+
+    output<span class="o">$</span>raised <span class="o">&lt;-</span> renderChart<span class="p">({</span>
+        dat <span class="o">&lt;-</span> cmGrpMoney<span class="p">[</span>cmGrpMoney<span class="o">$</span>CMTE_NM <span class="o">==</span> input<span class="o">$</span>committee<span class="p">,]</span>
+        p1 <span class="o">&lt;-</span> mPlot<span class="p">(</span>x <span class="o">=</span> <span class="s">&#39;OnDate&#39;</span><span class="p">,</span> y <span class="o">=</span> <span class="kt">list</span><span class="p">(</span><span class="s">&#39;TotalRaised&#39;</span><span class="p">,</span> <span class="s">&#39;TotalSpent&#39;</span><span class="p">),</span> data <span class="o">=</span> dat<span class="p">,</span> type <span class="o">=</span> <span class="s">&#39;Line&#39;</span><span class="p">,</span> 
+                    labels <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;Total Raised&#39;</span><span class="p">,</span> <span class="s">&#39;Total Spent&#39;</span><span class="p">),</span> 
+                    pointSize <span class="o">=</span> <span class="m">0</span><span class="p">,</span> lineSize <span class="o">=</span> <span class="m">1</span><span class="p">)</span>
+
+        p1<span class="o">$</span>set<span class="p">(</span>dom <span class="o">=</span> <span class="s">&#39;raised&#39;</span><span class="p">,</span> lineColors <span class="o">=</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;green&#39;</span><span class="p">,</span> <span class="s">&#39;red&#39;</span><span class="p">))</span>
+        <span class="kr">return</span><span class="p">(</span>p1<span class="p">)})</span>
+
+
+<span class="p">})</span>
+</code></pre></div>
+</div>
+
+
+    </div>
+
+  </body>
+</html>
