@@ -3,10 +3,10 @@
   <channel>
     <title>Phillip Hetzel</title>
     <description>Please poke around this website to get a feel for my work!</description>
-    <link>phetzel1.github.io//</link>
-    <atom:link href="phetzel1.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 28 Apr 2015 16:01:55 -0400</pubDate>
-    <lastBuildDate>Tue, 28 Apr 2015 16:01:55 -0400</lastBuildDate>
+    <link>phetzel1.github.io/</link>
+    <atom:link href="phetzel1.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 28 Apr 2015 16:35:01 -0400</pubDate>
+    <lastBuildDate>Tue, 28 Apr 2015 16:35:01 -0400</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
@@ -269,8 +269,8 @@ shinyServer&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kr
 &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</description>
         <pubDate>Mon, 27 Apr 2015 12:08:23 -0400</pubDate>
-        <link>phetzel1.github.io//projects/2015/04/27/FEC_Markdown/</link>
-        <guid isPermaLink="true">phetzel1.github.io//projects/2015/04/27/FEC_Markdown/</guid>
+        <link>phetzel1.github.io/projects/2015/04/27/FEC_Markdown/</link>
+        <guid isPermaLink="true">phetzel1.github.io/projects/2015/04/27/FEC_Markdown/</guid>
         
         
         <category>projects</category>
@@ -475,8 +475,8 @@ ggplot&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;num_issues&lt;span class=&qu
 &lt;p&gt;There you have it!  This was a quick look at some publicly available lobbying data.  Eventually, I will be making a Shiny app that will allow for some user control of the data set.  Thanks for reading!&lt;/p&gt;
 </description>
         <pubDate>Sun, 26 Apr 2015 20:00:00 -0400</pubDate>
-        <link>phetzel1.github.io//projects/2015/04/26/Lobbying/</link>
-        <guid isPermaLink="true">phetzel1.github.io//projects/2015/04/26/Lobbying/</guid>
+        <link>phetzel1.github.io/projects/2015/04/26/Lobbying/</link>
+        <guid isPermaLink="true">phetzel1.github.io/projects/2015/04/26/Lobbying/</guid>
         
         
         <category>projects</category>
