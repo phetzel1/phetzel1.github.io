@@ -5,41 +5,64 @@
     <description>Please poke around this website to get a feel for my work!</description>
     <link>phetzel1.github.io/</link>
     <atom:link href="phetzel1.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 28 Apr 2015 16:35:01 -0400</pubDate>
-    <lastBuildDate>Tue, 28 Apr 2015 16:35:01 -0400</lastBuildDate>
+    <pubDate>Tue, 28 Apr 2015 22:00:39 -0400</pubDate>
+    <lastBuildDate>Tue, 28 Apr 2015 22:00:39 -0400</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
     
       <item>
-        <title>Election</title>
-        <description>&lt;h1&gt;FEC Data&lt;/h1&gt;
-
-&lt;p&gt;Phillip Hetzel&lt;br&gt;
-April 23, 2015  &lt;/p&gt;
-
-&lt;h2&gt;Objective&lt;/h2&gt;
+        <title>Understanding Federal Election Data</title>
+        <description>&lt;h2&gt;Objective&lt;/h2&gt;
 
 &lt;p&gt;I&amp;#39;ve always been fascinated (and frustrated) with the state of campaign finance in the United States of America.  It&amp;#39;s because of this fascination that I&amp;#39;ve turned my attention to the Federal Election Commissions Open Government policy to view the &amp;quot;trackable&amp;quot; donations that candidates are receiving.  I say trackable donations because a great deal of money does not have to be disclosed in an easy to track fashion.&lt;/p&gt;
 
-&lt;p&gt;The general purpose of this project is to answer two questions:&lt;/p&gt;
+&lt;p&gt;The general purpose of this project is to answer one question:&lt;/p&gt;
 
 &lt;ul&gt;
-&lt;li&gt;Which companies give the most money over time?&lt;/li&gt;
-&lt;li&gt;Which political direction companies are likely to donate?&lt;/li&gt;
-&lt;li&gt;Which candidates are receiving the most money over time?&lt;/li&gt;
+&lt;li&gt;How do Political Action Committees spend and receive money over time.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2&gt;The Data&lt;/h2&gt;
+&lt;h2&gt;Data Description&lt;/h2&gt;
 
 &lt;p&gt;Here are some descriptions of the tables we will download.  They are set up to be relational.&lt;/p&gt;
 
-&lt;p&gt;|Name                        |Description                                                                                                                                                                                                                                                                                                                                                          |Data.frame |
-|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-|Commitees                   |The committee master file contains one record for each committee registered with the Federal Election Commission. This includes federal political action committees and party committees, campaign committees for presidential, house and senate candidates, as well as groups or organizations who are spending money for or against candidates for federal office. |committee  |
-|Candidates                  |The candidate master file contains one record for each candidate who has either registered with the Federal Election Commission or appeared on a ballot list prepared by a state elections office.                                                                                                                                                                   |candidates |
-|Linkages                    |This file contains one record for each candidate to committee linakge.                                                                                                                                                                                                                                                                                               |linkage    |
-|Itemized Records            |The itemized records (miscellaneous transactions) file contains all transactions (contributions, transfers, etc. among federal committees).                                                                                                                                                                                                                          |cm2cm      |
-|Contributions to Candidates |The itemized committee contributions file contains each contribution or independent expenditure made by a PAC, party committee, candidate committee, or other federal committee to a candidate during the two-year election cycle.                                                                                                                                   |cm2cand    |
-|Individual Contributions    |The individual contributions file contains each contribution from an individual to a federal committee if the contribution was at least $200.                                                                                                                                                                                                                        |indiv2cm   |&lt;/p&gt;
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;Name&lt;/th&gt;
+&lt;th&gt;Description&lt;/th&gt;
+&lt;th&gt;Data frame&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Commitees&lt;/td&gt;
+&lt;td&gt;The committee master file contains one record for each committee registered with the Federal Election Commission. This includes federal political action committees and party committees, campaign committees for presidential, house and senate candidates, as well as groups or organizations who are spending money for or against candidates for federal office.&lt;/td&gt;
+&lt;td&gt;committee&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Candidates&lt;/td&gt;
+&lt;td&gt;The candidate master file contains one record for each candidate who has either registered with the Federal Election Commission or appeared on a ballot list prepared by a state elections office.&lt;/td&gt;
+&lt;td&gt;candidates&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Linkages&lt;/td&gt;
+&lt;td&gt;This file contains one record for each candidate to committee linakge.&lt;/td&gt;
+&lt;td&gt;linkage&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Itemized Records&lt;/td&gt;
+&lt;td&gt;The itemized records (miscellaneous transactions) file contains all transactions (contributions, transfers, etc. among federal committees).&lt;/td&gt;
+&lt;td&gt;cm2cm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Contributions to Candidates&lt;/td&gt;
+&lt;td&gt;The itemized committee contributions file contains each contribution or independent expenditure made by a PAC, party committee, candidate committee, or other federal committee to a candidate during the two-year election cycle.&lt;/td&gt;
+&lt;td&gt;cm2cand&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Individual Contributions&lt;/td&gt;
+&lt;td&gt;The individual contributions file contains each contribution from an individual to a federal committee if the contribution was at least $200.&lt;/td&gt;
+&lt;td&gt;indiv2cm&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
 
 &lt;h2&gt;Let&amp;#39;s Get Coding&lt;/h2&gt;
 
@@ -223,7 +246,7 @@ check &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; check&lt;span class
 
 cmGrpMoney &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; cmGrpMoney&lt;span class=&quot;p&quot;&gt;[(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;!&lt;/span&gt;cmGrpMoney&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;CMTE_ID &lt;span class=&quot;o&quot;&gt;%in%&lt;/span&gt; check&lt;span class=&quot;p&quot;&gt;),]&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h2&gt;Product&lt;/h2&gt;
+&lt;h2&gt;Conclusion&lt;/h2&gt;
 
 &lt;p&gt;The goal of this work was simply to get the data into the correct format for analysis.  We can plug this new data output into a Shiny application to more dynamically view Assets and Liabilities of PACs over time.  Please go to my &lt;a href=&quot;https://phetzel1.shinyapps.io/Election_Data/&quot;&gt;Shiny Application&lt;/a&gt; and play around.  Start typing in a company name and see how active their PAC is!&lt;/p&gt;
 

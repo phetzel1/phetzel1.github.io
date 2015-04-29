@@ -1,24 +1,19 @@
 ---
 layout: post
-title:  "Election"
+title:  "Understanding Federal Election Data"
 date:   2015-04-27 16:08:23
 categories: projects
+comments: True
 ---
 
-# FEC Data
-Phillip Hetzel  
-April 23, 2015  
 ##Objective
 I've always been fascinated (and frustrated) with the state of campaign finance in the United States of America.  It's because of this fascination that I've turned my attention to the Federal Election Commissions Open Government policy to view the "trackable" donations that candidates are receiving.  I say trackable donations because a great deal of money does not have to be disclosed in an easy to track fashion.
 
-The general purpose of this project is to answer two questions:
+The general purpose of this project is to answer one question:
 
-* Which companies give the most money over time?
-* Which political direction companies are likely to donate?
-* Which candidates are receiving the most money over time?
+* How do Political Action Committees spend and receive money over time.
 
-
-##The Data
+##Data Description
 
 Here are some descriptions of the tables we will download.  They are set up to be relational.
 
@@ -257,7 +252,7 @@ check <- check$CMTE_ID
 cmGrpMoney <- cmGrpMoney[(!cmGrpMoney$CMTE_ID %in% check),]
 ```
 
-##Product
+##Conclusion
 
 The goal of this work was simply to get the data into the correct format for analysis.  We can plug this new data output into a Shiny application to more dynamically view Assets and Liabilities of PACs over time.  Please go to my [Shiny Application](https://phetzel1.shinyapps.io/Election_Data/) and play around.  Start typing in a company name and see how active their PAC is!
 

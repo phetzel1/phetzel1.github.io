@@ -379,6 +379,12 @@ tbody tr:nth-child(odd) th {
   color: inherit;
 }
 
+#disqus_thread{
+    margin-right: 10%;
+    width: 60%;
+    float: right;
+    
+}
 
 /*
  * Pagination

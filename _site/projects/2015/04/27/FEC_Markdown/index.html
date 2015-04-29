@@ -11,7 +11,7 @@
 
   <title>
     
-      Election &middot; Phillip Hetzel
+      Understanding Federal Election Data &middot; Phillip Hetzel
     
   </title>
 
@@ -98,37 +98,60 @@
 
     <div class="content container">
       <div class="post">
-  <h1 class="post-title">Election</h1>
+  <h1 class="post-title">Understanding Federal Election Data</h1>
   <span class="post-date">27 Apr 2015</span>
-  <h1>FEC Data</h1>
-
-<p>Phillip Hetzel<br>
-April 23, 2015  </p>
-
-<h2>Objective</h2>
+  <h2>Objective</h2>
 
 <p>I&#39;ve always been fascinated (and frustrated) with the state of campaign finance in the United States of America.  It&#39;s because of this fascination that I&#39;ve turned my attention to the Federal Election Commissions Open Government policy to view the &quot;trackable&quot; donations that candidates are receiving.  I say trackable donations because a great deal of money does not have to be disclosed in an easy to track fashion.</p>
 
-<p>The general purpose of this project is to answer two questions:</p>
+<p>The general purpose of this project is to answer one question:</p>
 
 <ul>
-<li>Which companies give the most money over time?</li>
-<li>Which political direction companies are likely to donate?</li>
-<li>Which candidates are receiving the most money over time?</li>
+<li>How do Political Action Committees spend and receive money over time.</li>
 </ul>
 
-<h2>The Data</h2>
+<h2>Data Description</h2>
 
 <p>Here are some descriptions of the tables we will download.  They are set up to be relational.</p>
 
-<p>|Name                        |Description                                                                                                                                                                                                                                                                                                                                                          |Data.frame |
-|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------|
-|Commitees                   |The committee master file contains one record for each committee registered with the Federal Election Commission. This includes federal political action committees and party committees, campaign committees for presidential, house and senate candidates, as well as groups or organizations who are spending money for or against candidates for federal office. |committee  |
-|Candidates                  |The candidate master file contains one record for each candidate who has either registered with the Federal Election Commission or appeared on a ballot list prepared by a state elections office.                                                                                                                                                                   |candidates |
-|Linkages                    |This file contains one record for each candidate to committee linakge.                                                                                                                                                                                                                                                                                               |linkage    |
-|Itemized Records            |The itemized records (miscellaneous transactions) file contains all transactions (contributions, transfers, etc. among federal committees).                                                                                                                                                                                                                          |cm2cm      |
-|Contributions to Candidates |The itemized committee contributions file contains each contribution or independent expenditure made by a PAC, party committee, candidate committee, or other federal committee to a candidate during the two-year election cycle.                                                                                                                                   |cm2cand    |
-|Individual Contributions    |The individual contributions file contains each contribution from an individual to a federal committee if the contribution was at least $200.                                                                                                                                                                                                                        |indiv2cm   |</p>
+<table><thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+<th>Data frame</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Commitees</td>
+<td>The committee master file contains one record for each committee registered with the Federal Election Commission. This includes federal political action committees and party committees, campaign committees for presidential, house and senate candidates, as well as groups or organizations who are spending money for or against candidates for federal office.</td>
+<td>committee</td>
+</tr>
+<tr>
+<td>Candidates</td>
+<td>The candidate master file contains one record for each candidate who has either registered with the Federal Election Commission or appeared on a ballot list prepared by a state elections office.</td>
+<td>candidates</td>
+</tr>
+<tr>
+<td>Linkages</td>
+<td>This file contains one record for each candidate to committee linakge.</td>
+<td>linkage</td>
+</tr>
+<tr>
+<td>Itemized Records</td>
+<td>The itemized records (miscellaneous transactions) file contains all transactions (contributions, transfers, etc. among federal committees).</td>
+<td>cm2cm</td>
+</tr>
+<tr>
+<td>Contributions to Candidates</td>
+<td>The itemized committee contributions file contains each contribution or independent expenditure made by a PAC, party committee, candidate committee, or other federal committee to a candidate during the two-year election cycle.</td>
+<td>cm2cand</td>
+</tr>
+<tr>
+<td>Individual Contributions</td>
+<td>The individual contributions file contains each contribution from an individual to a federal committee if the contribution was at least $200.</td>
+<td>indiv2cm</td>
+</tr>
+</tbody></table>
 
 <h2>Let&#39;s Get Coding</h2>
 
@@ -312,7 +335,7 @@ check <span class="o">&lt;-</span> check<span class="o">$</span>CMTE_ID
 
 cmGrpMoney <span class="o">&lt;-</span> cmGrpMoney<span class="p">[(</span><span class="o">!</span>cmGrpMoney<span class="o">$</span>CMTE_ID <span class="o">%in%</span> check<span class="p">),]</span>
 </code></pre></div>
-<h2>Product</h2>
+<h2>Conclusion</h2>
 
 <p>The goal of this work was simply to get the data into the correct format for analysis.  We can plug this new data output into a Shiny application to more dynamically view Assets and Liabilities of PACs over time.  Please go to my <a href="https://phetzel1.shinyapps.io/Election_Data/">Shiny Application</a> and play around.  Start typing in a company name and see how active their PAC is!</p>
 
@@ -363,4 +386,32 @@ shinyServer<span class="p">(</span><span class="kr">function</span><span class="
     </div>
 
   </body>
+  
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'philliphetzel';
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-62398626-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
 </html>
