@@ -10,25 +10,20 @@ relative_permalinks: true
 
 # Setup
 title:            Phillip Hetzel
-tagline:          'Data Addict, Late-Blooming Coder, Hot Sauce Enthusiast'
-description:      'Please poke around this website to get a feel for my work!'
+tagline:          'Data Addict, Hot Sauce Enthusiast'
+description:      'Data analytics for those of us who were not Computer Science majors'
 url:              phetzel1.github.io
 baseurl:          
 
-sass:
-    sass_dir:     _sass
-
-
 author:
   name:           'Phillip Hetzel'
-  url:            https://twitter.com/PJPretzel
-
-
+  url:            www.linkedin.com/in/philliphetzel
 
 github:
   repo:           https://github.com/phetzel1
 
-linkedin:         www.linkedin.com/in/philliphetzel
+linkedin:
+   link:         http://www.linkedin.com/in/philliphetzel
 
 
 categories:  [projects, posts]

@@ -41,3 +41,7 @@ Sci-kit Learn is a renowned machine-learning library for python.  The individual
 ###[Hyde Blog Theme](https://github.com/poole/hyde)
 
 This is the link to the theme I'm using, which was created by Mark Otto.  The blog itself is powered by the Jekyll static site generator.
+
+###[Database Joins](http://blog.codinghorror.com/a-visual-explanation-of-sql-joins/)
+
+Typically in a problem involving data, it's very beneficial to know the basics behind database joins.  I've found learning the different types of joins through pictures of Venn Diagrams to be the most helpful.
