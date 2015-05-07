@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      First Kaggle Competition &middot; Phillip Hetzel
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/public/css/poole.css">
+  <link rel="stylesheet" href="/public/css/syntax.css">
+  <link rel="stylesheet" href="/public/css/hyde.css">
+  <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=PT+Sans:400,400italic,700|Abril+Fatface">
+
+  <!-- Icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="phetzel1.github.iopublic/apple-touch-icon-144-precomposed.png">
+                                 <link rel="shortcut icon" href="phetzel1.github.iopublic/favicon.ico">
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+</head>
+
+
+  <body class = 'theme-base-08'>
+
+    <div class="sidebar">
+  <div class="container sidebar-sticky">
+    <div class="sidebar-about">
+      <h1>
+        <a href="/">
+          Phillip Hetzel
+        </a>
+      </h1>
+      <p class="lead">Data analytics for those of us who were not Computer Science majors</p>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a class="sidebar-nav-item" href="/">Home</a>
+
+      
+
+      
+      
+        
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/about/">About Me</a>
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/posts/">Blog Posts</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/projects/">Projects</a>
+          
+        
+      
+        
+          
+            <a class="sidebar-nav-item" href="/resources/">Resources</a>
+          
+        
+      
+
+      <a class="sidebar-nav-item" href="https://github.com/phetzel1">GitHub</a>
+      <a class="sidebar-nav-item" href="http://www.linkedin.com/in/philliphetzel">LinkedIn</a>
+    </nav>
+
+    <p>&copy; 2015. All rights reserved.</p>
+  </div>
+</div>
+
+
+    <div class="content container">
+      <div class="post">
+  <h1 class="post-title">First Kaggle Competition</h1>
+  <span class="post-date">04 May 2015</span>
+  <h2>Background</h2>
+
+<p>I&#39;m currently taking an excellent course on <a href="https://www.edx.org/">edX.org</a> called &quot;The Analytics Edge,&quot; taught by MIT.  The course structure helps the student learn a different statistical model every week.  For the past three weeks, the course sponsored a private <a href="https://www.kaggle.com/">Kaggle</a> competition.  In this blog post, I will walk you through the process that I used to place in the top 10% of the competition.</p>
+
+<h2>Purpose</h2>
+
+<p>The competition sponsor chose to study and analyze the popularity of New York Times website articles.  The competitors were to create a model that would accurately predict whether or not an article would be popular, with popularity being defined as 25 or more comments on the article.  Let&#39;s grab the data and look how it is structured.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">train1 <span class="o">&lt;-</span> read.csv<span class="p">(</span><span class="s">&#39;NYTimesBlogTrain.csv&#39;</span><span class="p">,</span> stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
+test1 <span class="o">&lt;-</span> read.csv<span class="p">(</span><span class="s">&#39;NYTimesBlogTest.csv&#39;</span><span class="p">,</span> stringsAsFactors <span class="o">=</span> <span class="bp">F</span><span class="p">)</span>
+str<span class="p">(</span>train1<span class="p">)</span>
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">## &#39;data.frame&#39;:    6532 obs. of  10 variables:
+##  $ NewsDesk      : chr  &quot;Business&quot; &quot;Culture&quot; &quot;Business&quot; &quot;Business&quot; ...
+##  $ SectionName   : chr  &quot;Crosswords/Games&quot; &quot;Arts&quot; &quot;Business Day&quot; &quot;Business Day&quot; ...
+##  $ SubsectionName: chr  &quot;&quot; &quot;&quot; &quot;Dealbook&quot; &quot;Dealbook&quot; ...
+##  $ Headline      : chr  &quot;More School Daze&quot; &quot;New 96-Page Murakami Work Coming in December&quot; &quot;Public Pension Funds Stay Mum on Corporate Expats&quot; &quot;Boot Camp for Bankers&quot; ...
+##  $ Snippet       : chr  &quot;A puzzle from Ethan Cooper that reminds me that a bill is due.&quot; &quot;The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His&quot;| __truncated__ &quot;Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little&quot;| __truncated__ &quot;As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service &quot;| __truncated__ ...
+##  $ Abstract      : chr  &quot;A puzzle from Ethan Cooper that reminds me that a bill is due.&quot; &quot;The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His&quot;| __truncated__ &quot;Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little&quot;| __truncated__ &quot;As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service &quot;| __truncated__ ...
+##  $ WordCount     : int  508 285 1211 1405 181 245 258 893 1077 188 ...
+##  $ PubDate       : chr  &quot;2014-09-01 22:00:09&quot; &quot;2014-09-01 21:14:07&quot; &quot;2014-09-01 21:05:36&quot; &quot;2014-09-01 20:43:34&quot; ...
+##  $ Popular       : int  1 0 0 1 1 1 0 1 1 0 ...
+##  $ UniqueID      : int  1 2 3 4 5 6 7 8 9 10 ...
+</code></pre></div>
+<p>Now let&#39;s look at the first couple of rows (the <code>kable</code> function is just a way to make the chart prettier in HTML):</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">kable<span class="p">(</span><span class="kp">head</span><span class="p">(</span>train1<span class="p">))</span>
+</code></pre></div>
+<table><thead>
+<tr>
+<th>NewsDesk</th>
+<th>SectionName</th>
+<th>SubsectionName</th>
+<th>Headline</th>
+<th>Snippet</th>
+<th>Abstract</th>
+<th style="text-align: left">WordCount</th>
+<th style="text-align: center">PubDate</th>
+<th style="text-align: center">Popular</th>
+<th style="text-align: center">UniqueID</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Business</td>
+<td>Crosswords/Games</td>
+<td></td>
+<td>More School Daze</td>
+<td>A puzzle from Ethan Cooper that reminds me that a bill is due.</td>
+<td>A puzzle from Ethan Cooper that reminds me that a bill is due.</td>
+<td style="text-align: left">508</td>
+<td style="text-align: center">2014-09-01 22:00:09</td>
+<td style="text-align: center">1</td>
+<td style="text-align: center">1</td>
+</tr>
+<tr>
+<td>Culture</td>
+<td>Arts</td>
+<td></td>
+<td>New 96-Page Murakami Work Coming in December</td>
+<td>The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His Years of Pilgrimage.</td>
+<td>The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His Years of Pilgrimage.</td>
+<td style="text-align: left">285</td>
+<td style="text-align: center">2014-09-01 21:14:07</td>
+<td style="text-align: center">0</td>
+<td style="text-align: center">2</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>Business Day</td>
+<td>Dealbook</td>
+<td>Public Pension Funds Stay Mum on Corporate Expats</td>
+<td>Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little about the strategy, which could hurt the nations tax base.</td>
+<td>Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little about the strategy, which could hurt the nations tax base.</td>
+<td style="text-align: left">1211</td>
+<td style="text-align: center">2014-09-01 21:05:36</td>
+<td style="text-align: center">0</td>
+<td style="text-align: center">3</td>
+</tr>
+<tr>
+<td>Business</td>
+<td>Business Day</td>
+<td>Dealbook</td>
+<td>Boot Camp for Bankers</td>
+<td>As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service members ideal customers.</td>
+<td>As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service members ideal customers.</td>
+<td style="text-align: left">1405</td>
+<td style="text-align: center">2014-09-01 20:43:34</td>
+<td style="text-align: center">1</td>
+<td style="text-align: center">4</td>
+</tr>
+<tr>
+<td>Science</td>
+<td>Health</td>
+<td></td>
+<td>Of Little Help to Older Knees</td>
+<td>Middle-aged and older patients are unlikely to benefit in the long term from surgery to repair tears in the meniscus, pads of cartilage in the knee, a new review of studies has found.</td>
+<td>Middle-aged and older patients are unlikely to benefit in the long term from surgery to repair tears in the meniscus, pads of cartilage in the knee, a new review of studies has found.</td>
+<td style="text-align: left">181</td>
+<td style="text-align: center">2014-09-01 18:58:51</td>
+<td style="text-align: center">1</td>
+<td style="text-align: center">5</td>
+</tr>
+<tr>
+<td>Science</td>
+<td>Health</td>
+<td></td>
+<td>A Benefit of Legal Marijuana</td>
+<td>A new study has found evidence that legal access to marijuana is associated with fewer opioid overdose deaths, but researchers said their findings should not be used as the basis for the wide adoption of legalized cannabis.</td>
+<td>A new study has found evidence that legal access to marijuana is associated with fewer opioid overdose deaths, but researchers said their findings should not be used as the basis for the wide adoption of legalized cannabis.</td>
+<td style="text-align: left">245</td>
+<td style="text-align: center">2014-09-01 18:52:22</td>
+<td style="text-align: center">1</td>
+<td style="text-align: center">6</td>
+</tr>
+</tbody></table>
+
+<h2>What&#39;s the Plan?</h2>
+
+<p>Right away I had a general direction of how I wanted to make my model.  Here are some things I decided immediately:</p>
+
+<ol>
+<li><p>This is a binary classification problem.  In other words, we are going to try to predict that an article is either popular, or not popular.  </p></li>
+<li><p>I do not want to use a great deal of text analytics.  Some of my peers decided to use &quot;Bag of Words&quot; for feature extraction.  More on this later.</p></li>
+<li><p>The data allows for time-based feature extraction (i.e. I can pull out the hour and day of an article).</p></li>
+<li><p>There are many recurring series of articles, many of which are either very popular or not at all popular.</p></li>
+</ol>
+
+<p>With these general observations in mind, I&#39;m going to start adding features to this data-set to later put into a model.</p>
+
+<h2>Adding Features (and General Maintenance)</h2>
+
+<p>Since some of the features we will eventually put into our model are either categorical or binary, we will preprocess the training and testing data-set together.  This ensures that the training and testing set will have the same set of factors when we eventually split them apart again.  For the <code>complete</code> data frame, we will not include the <code>Popular</code> variable.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">complete <span class="o">&lt;-</span> <span class="kp">rbind</span><span class="p">(</span>train1<span class="p">[,</span><span class="kt">c</span><span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">8</span><span class="p">,</span><span class="m">10</span><span class="p">)],</span> test1<span class="p">)</span>
+</code></pre></div>
+<p>The weekday and time an article was published may be useful in determining its popularity.  I&#39;m going to separate the publish date feature into discrete <code>Weekday</code> and <code>Hour</code> features.  They will be stored as factors.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">complete<span class="o">$</span>PubDate <span class="o">=</span> <span class="kp">strptime</span><span class="p">(</span>complete<span class="o">$</span>PubDate<span class="p">,</span> <span class="s">&quot;%Y-%m-%d %H:%M:%S&quot;</span><span class="p">)</span>
+complete<span class="o">$</span>Weekday <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>complete<span class="o">$</span>PubDate<span class="o">$</span>wday<span class="p">)</span>
+complete<span class="o">$</span>Hour <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>complete<span class="o">$</span>PubDate<span class="o">$</span>hour<span class="p">)</span>
+</code></pre></div>
+<p>I have also noticed that the <code>NewsDesk</code>, <code>SectionName</code>, and <code>SubSectionName</code> are not consistently filled out.  Therefore, I want to collapse these fields into one feature.  My hope is that I will be able to better group the data with a more complete set of section categories.  I use a host of <code>ifelse</code> functions to fill in my new <code>Section</code> feature.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;TStyle&#39;</span><span class="p">,</span> <span class="s">&#39;Style&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Styles&#39;</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Style&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Foreign&#39;</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;World&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>complete<span class="o">$</span>SubsectionName <span class="o">==</span> <span class="s">&#39;Education&#39;</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Education&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;National&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;U.S.&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Politics&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Science&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Health&#39;</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Health&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;OpEd&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Opinion&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Opinion&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Crosswords/Games&#39;</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> complete<span class="o">$</span>SectionName<span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Culture&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Arts&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Culture&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Technology&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Open&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Technology&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Business&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Business Day&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Business&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Travel&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Travel&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Travel&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Sports&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Sports&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Sports&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Magazine&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Magazine&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Magazine&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">(</span>complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;Multimedia&#39;</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Multimedia&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section<span class="p">)</span>
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">ifelse</span><span class="p">((</span>complete<span class="o">$</span>NewsDesk <span class="o">==</span> <span class="s">&#39;Metro&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;N.Y./Region&#39;</span> <span class="o">|</span> complete<span class="o">$</span>SectionName <span class="o">==</span> <span class="s">&#39;N.Y. / Region&#39;</span><span class="p">)</span> <span class="o">&amp;</span> complete<span class="o">$</span>Section <span class="o">==</span> <span class="s">&#39;&#39;</span><span class="p">,</span> <span class="s">&#39;Metro&#39;</span><span class="p">,</span> complete<span class="o">$</span>Section <span class="p">)</span>
+</code></pre></div>
+<p>After doing some digging around the training set, I notice that headlines that ask questions seem to have a higher rate of popularity.  I introduce the <code>Question</code> variable to capture this.  The <code>grepl</code> function returns a <code>TRUE</code> or <code>FALSE</code> value if any value in the regular expression is in the headline.  For more on regular expressions, I would suggest <a href="https://msdn.microsoft.com/en-us/library/az24scfc%28v=vs.110%29.aspx">this link</a>.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">complete<span class="o">$</span>Question <span class="o">&lt;-</span> <span class="kp">as.numeric</span><span class="p">(</span><span class="kp">grepl</span><span class="p">(</span><span class="s">&#39;\\?|^How|^Should|^When|^Why|^What&#39;</span><span class="p">,</span> complete<span class="o">$</span>Headline<span class="p">,</span> perl <span class="o">=</span> <span class="bp">T</span><span class="p">))</span>
+</code></pre></div>
+<p>I also want to add two new features in reference to the fourth point in the &quot;What&#39;s the Plan&quot; section above.  I look through the data set and note which recurring articles are popular, and which are not.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">pop_headlines <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;^Readers Respond&#39;</span><span class="p">,</span> <span class="s">&#39;^No Comment Necessary&#39;</span><span class="p">,</span> <span class="s">&#39;^Living With Cancer&#39;</span><span class="p">,</span> <span class="s">&#39;^Ask Well&#39;</span><span class="p">,</span> <span class="s">&#39;^Facts&#39;</span><span class="p">,</span> <span class="s">&#39;Quandary:&#39;</span><span class="p">,</span> <span class="s">&#39;^Think Like a Doctor&#39;</span><span class="p">)</span>
+unpop_headlines <span class="o">&lt;-</span> <span class="kt">c</span><span class="p">(</span><span class="s">&#39;^[0-9]&#39;</span><span class="p">,</span> <span class="s">&quot;^Analytics:&quot;</span><span class="p">,</span> <span class="s">&quot;^Behind the Cover Story&quot;</span><span class="p">,</span> <span class="s">&quot;^Big Ticket&quot;</span><span class="p">,</span> <span class="s">&quot;^Book Review Podcast&quot;</span><span class="p">,</span>
+                     <span class="s">&quot;^Classical Playlist&quot;</span><span class="p">,</span> <span class="s">&quot;^CMJ 2014&quot;</span><span class="p">,</span> <span class="s">&quot;^Daily Clip Report&quot;</span><span class="p">,</span> <span class="s">&quot;^Daily Report&quot;</span><span class="p">,</span> <span class="s">&quot;^Election 2014&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;Fashion Week&quot;</span><span class="p">,</span> <span class="s">&quot;^First Draft Focus&quot;</span><span class="p">,</span> <span class="s">&quot;^First Draft Video&quot;</span><span class="p">,</span> <span class="s">&quot;^Friday Night Music&quot;</span><span class="p">,</span> <span class="s">&quot;^From The Upshot&quot;</span><span class="p">,</span>
+                     <span class="s">&quot;^In Performance&quot;</span><span class="p">,</span> <span class="s">&quot;^International Arts Events&quot;</span><span class="p">,</span> <span class="s">&quot;^Joe on WNYC&quot;</span><span class="p">,</span> <span class="s">&quot;^Lunchtime Laughs&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;^Morning Agenda&quot;</span><span class="p">,</span> <span class="s">&quot;^New York City&#39;s Week in Pictures&quot;</span><span class="p">,</span> <span class="s">&quot;^New York Parking Alert&quot;</span><span class="p">,</span> <span class="s">&quot;Pictures of the Day&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;^NYTLNreads&quot;</span><span class="p">,</span> <span class="s">&quot;^On This Day&quot;</span><span class="p">,</span> <span class="s">&quot;^Poetry Pairings&quot;</span><span class="p">,</span> <span class="s">&quot;^Politics Helpline&quot;</span><span class="p">,</span> <span class="s">&quot;^Popcast&quot;</span><span class="p">,</span> <span class="s">&quot;^Q\\. and A\\.&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;^Reading the Times&quot;</span><span class="p">,</span> <span class="s">&quot;^Student Crossword&quot;</span><span class="p">,</span> <span class="s">&quot;^Sunday Breakfast Menu&quot;</span><span class="p">,</span> <span class="s">&quot;^Test Yourself&quot;</span><span class="p">,</span> <span class="s">&quot;^Text to Text&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;^The Daily Gift&quot;</span><span class="p">,</span> <span class="s">&quot;^Throwback Thursday&quot;</span><span class="p">,</span> <span class="s">&quot;^Today in Politics&quot;</span><span class="p">,</span> <span class="s">&quot;^Today in Small Business&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;^Toronto Festival 2014&quot;</span><span class="p">,</span> <span class="s">&quot;^Tune Into The Times&quot;</span><span class="p">,</span> <span class="s">&quot;^Tune In to The Times&quot;</span><span class="p">,</span> <span class="s">&quot;^Under Cover&quot;</span><span class="p">,</span> <span class="s">&quot;^Variety&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;^Verbatim&quot;</span><span class="p">,</span> <span class="s">&quot;^Video Reviews&quot;</span><span class="p">,</span> <span class="s">&quot;^Walkabout&quot;</span><span class="p">,</span> <span class="s">&quot;^Weekend Reading&quot;</span><span class="p">,</span> <span class="s">&quot;^Weekly News Quiz&quot;</span><span class="p">,</span> <span class="s">&quot;Weekly Wrap&quot;</span><span class="p">,</span> 
+                     <span class="s">&quot;^What We&#39;re&quot;</span><span class="p">,</span> <span class="s">&quot;^What&#39;s Going On&quot;</span><span class="p">,</span> <span class="s">&quot;^Word of the Day&quot;</span><span class="p">)</span>
+
+complete<span class="o">$</span>Section <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>complete<span class="o">$</span>Section<span class="p">)</span>
+</code></pre></div>
+<p>This allows me to plug these vectors into a <code>grepl</code> command.  The <code>collapse</code> parameter in the <code>paste</code> command places a pipe character between each of the vector items.  The pipe character tells R to return <code>TRUE</code> if any of the vector items are present in the headline.  The new features are called <code>Bonus</code> and <code>NotBonus</code>, which are simple indicator variables.  An observation will receive a 1 in the <code>Bonus</code> variable if they are present in the <code>pop_headlines</code> vector.  An observation will also receive a 1 in the <code>NotBonus</code> variable if they are <em>not</em> present in the <code>unpop_headlines</code>.  </p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">complete<span class="o">$</span>Bonus <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span><span class="kp">ifelse</span><span class="p">(</span>
+    <span class="kp">grepl</span><span class="p">(</span><span class="kp">paste</span><span class="p">(</span>pop_headlines<span class="p">,</span> collapse <span class="o">=</span> <span class="s">&#39;|&#39;</span><span class="p">),</span> fixed <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> complete<span class="o">$</span>Headline<span class="p">),</span> <span class="m">1</span><span class="p">,</span> <span class="m">0</span>
+<span class="p">))</span>
+
+complete<span class="o">$</span>NotBonus <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span><span class="kp">ifelse</span><span class="p">(</span>
+    <span class="kp">grepl</span><span class="p">(</span><span class="kp">paste</span><span class="p">(</span>unpop_headlines<span class="p">,</span> collapse <span class="o">=</span> <span class="s">&#39;|&#39;</span><span class="p">)</span> <span class="p">,</span> fixed <span class="o">=</span> <span class="bp">F</span><span class="p">,</span> complete<span class="o">$</span>Headline<span class="p">)</span> <span class="o">|</span> complete<span class="o">$</span>SubsectionName <span class="o">==</span> <span class="s">&#39;Asia Pacific&#39;</span><span class="p">,</span> <span class="m">0</span><span class="p">,</span> <span class="m">1</span>
+<span class="p">))</span>
+</code></pre></div>
+<p>I also want to reduce the <code>WordCount</code> to a logarithmic scale (I&#39;m adding 1 to the <code>WordCount</code> variable to protect against observations with a <code>WordCount</code> of 0).</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">complete<span class="o">$</span>WordCount <span class="o">&lt;-</span> <span class="kp">log</span><span class="p">(</span><span class="m">1</span> <span class="o">+</span> complete<span class="o">$</span>WordCount<span class="p">)</span>
+</code></pre></div>
+<p>That&#39;s all the feature extraction we&#39;ll do for this data-set; we don&#39;t want to over-fit.  The last step is to split the data back into training and testing sets, then adding back the response variable.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">train <span class="o">&lt;-</span> <span class="kp">head</span><span class="p">(</span>complete<span class="p">,</span> <span class="kp">nrow</span><span class="p">(</span>train1<span class="p">))</span>
+test <span class="o">&lt;-</span> <span class="kp">tail</span><span class="p">(</span>complete<span class="p">,</span> <span class="kp">nrow</span><span class="p">(</span>test1<span class="p">))</span>
+
+train<span class="o">$</span>Popular <span class="o">&lt;-</span> train1<span class="o">$</span>Popular
+</code></pre></div>
+<h2>Forming a Model</h2>
+
+<p>I&#39;m going to form three models:</p>
+
+<ol>
+<li><p>Logistic Regression</p></li>
+<li><p>Random Forest</p></li>
+<li><p>Gradient Boosted Tree</p></li>
+</ol>
+
+<h3>Logistic Regression</h3>
+
+<p>A logistic regression may be a decent model choice because it lends itself to binary classification problems.  We will use the <code>glm</code> command, and use the <code>Section</code>, <code>Weekday</code>, <code>Question</code>, <code>Bonus</code>, and <code>NotBonus</code> to predict <code>Popular</code>.  </p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">model_glm <span class="o">&lt;-</span> glm<span class="p">(</span>Popular <span class="o">~</span> Section <span class="o">+</span> Weekday <span class="o">+</span> Question <span class="o">+</span> Bonus <span class="o">+</span> NotBonus<span class="p">,</span> family <span class="o">=</span> binomial<span class="p">,</span> data <span class="o">=</span> train<span class="p">)</span>
+</code></pre></div>
+<p>Let&#39;s see how this model performed on the training set.  The <code>response</code> parameter notifies R to return probability rather than the predicted class.  For this model, we&#39;ll measure the accuracy (True Negatives + True Positives / # of observations)</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">glm_pred <span class="o">&lt;-</span> predict<span class="p">(</span>model_glm<span class="p">,</span> type <span class="o">=</span> <span class="s">&#39;response&#39;</span><span class="p">)</span>
+
+t <span class="o">&lt;-</span> <span class="kp">table</span><span class="p">(</span>train<span class="o">$</span>Popular<span class="p">,</span> glm_pred <span class="o">&gt;</span> <span class="m">.5</span><span class="p">)</span>
+<span class="p">(</span><span class="kp">t</span><span class="p">[</span><span class="m">1</span><span class="p">,</span> <span class="m">1</span><span class="p">]</span> <span class="o">+</span> <span class="kp">t</span><span class="p">[</span><span class="m">2</span><span class="p">,</span> <span class="m">2</span><span class="p">])</span><span class="o">/</span><span class="kp">nrow</span><span class="p">(</span>train<span class="p">)</span>
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">## [1] 0.8948255
+</code></pre></div>
+<p>That accuracy is okay, but we can do better by using more complex statistical models.</p>
+
+<h3>Random Forest</h3>
+
+<p>The random forest model is a strong choice for this problem because it will be able to capture non-linear relationships.  We will use the <code>train</code> function from the <code>caret</code> package in order to cross validate the random forest model.  The competition is scoring off of the model with the best Area Under the Curve (AUC), which is why we are using <code>ROC</code> as our metric.  The <code>pROC</code> package allows us to use the <code>ROC</code> metric.</p>
+
+<p>The <code>train</code> function does not like when the response variable (Popular) is numeric, so the first step is to change the values to either &quot;yes&quot; or &quot;no.&quot;  Note that using the train function classification calls for the response variable to be a factor.</p>
+
+<p>Full disclosure: I know from previous iterations that the best <code>mtry</code> value is in the range of 8 - 15.  Additionally in my original model, I used 10 fold cross validation with <code>ntree</code> set at 1000.  This took a loooooooooooong time on my puny laptop, so I&#39;ve purposely made the model less computationally expensive for the purpose of writing this post.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r"><span class="kn">require</span><span class="p">(</span>randomForest<span class="p">)</span>
+<span class="kn">require</span><span class="p">(</span>caret<span class="p">)</span>
+<span class="kn">require</span><span class="p">(</span>e1071<span class="p">)</span>
+<span class="kn">require</span><span class="p">(</span>pROC<span class="p">)</span>
+
+train<span class="o">$</span>Popular <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span>train1<span class="o">$</span>Popular<span class="p">)</span>
+train<span class="o">$</span>Popular <span class="o">&lt;-</span> <span class="kp">as.factor</span><span class="p">(</span><span class="kp">ifelse</span><span class="p">(</span>train<span class="o">$</span>Popular <span class="o">==</span> <span class="s">&quot;0&quot;</span><span class="p">,</span> <span class="s">&#39;no&#39;</span><span class="p">,</span> <span class="s">&#39;yes&#39;</span><span class="p">))</span>
+
+rfGrid <span class="o">=</span> <span class="kp">expand.grid</span><span class="p">(</span><span class="m">.</span>mtry <span class="o">=</span> <span class="m">8</span><span class="o">:</span><span class="m">15</span><span class="p">)</span>
+
+<span class="kp">set.seed</span><span class="p">(</span><span class="m">1</span><span class="p">)</span>
+model_rf_cv <span class="o">&lt;-</span> train<span class="p">(</span>Popular <span class="o">~</span> Question <span class="o">+</span> Bonus <span class="o">+</span> NotBonus <span class="o">+</span> Section <span class="o">+</span> Weekday <span class="o">+</span> Hour<span class="p">,</span> data <span class="o">=</span> train<span class="p">,</span> metric <span class="o">=</span> <span class="s">&#39;ROC&#39;</span><span class="p">,</span> method <span class="o">=</span> <span class="s">&#39;rf&#39;</span><span class="p">,</span> 
+                  ntree <span class="o">=</span> <span class="m">1000</span><span class="p">,</span> nodesize <span class="o">=</span> <span class="m">5</span><span class="p">,</span> tuneGrid <span class="o">=</span> rfGrid<span class="p">,</span> 
+                  trControl <span class="o">=</span> trainControl<span class="p">(</span><span class="s">&#39;cv&#39;</span><span class="p">,</span> number <span class="o">=</span> <span class="m">5</span><span class="p">,</span> allowParallel <span class="o">=</span> <span class="bp">T</span><span class="p">,</span> 
+                                           classProbs <span class="o">=</span> <span class="bp">T</span><span class="p">,</span> summaryFunction <span class="o">=</span> twoClassSummary<span class="p">))</span>
+
+model_rf_cv
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">## Random Forest 
+## 
+## 6532 samples
+##   15 predictor
+##    2 classes: &#39;no&#39;, &#39;yes&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold) 
+## 
+## Summary of sample sizes: 5226, 5226, 5226, 5225, 5225 
+## 
+## Resampling results across tuning parameters:
+## 
+##   mtry  ROC        Sens       Spec       ROC SD      Sens SD   
+##    8    0.8821224  0.9571629  0.6066231  0.01077888  0.01019918
+##    9    0.8828425  0.9555083  0.6148716  0.01506417  0.01247153
+##   10    0.8828170  0.9547730  0.6075615  0.01149230  0.01233141
+##   11    0.8796088  0.9542215  0.6112103  0.01282544  0.01224512
+##   12    0.8807107  0.9529348  0.6130451  0.01158821  0.01289943
+##   13    0.8806497  0.9509125  0.6112228  0.01244417  0.01257015
+##   14    0.8804412  0.9509125  0.6121277  0.01218954  0.01216024
+##   15    0.8816241  0.9507285  0.6038959  0.01424000  0.01246921
+##   Spec SD   
+##   0.01984507
+##   0.02522791
+##   0.03101629
+##   0.02453448
+##   0.02869649
+##   0.03256856
+##   0.02642122
+##   0.02793863
+## 
+## ROC was used to select the optimal model using  the largest value.
+## The final value used for the model was mtry = 9.
+</code></pre></div>
+<p>The above model takes a while to run because the function runs is performing k-fold cross validation over five folds, for eight different values of <code>mtry</code> (<code>mtry</code> is the number of features sampled for splitting at each node).</p>
+
+<h3>Stochastic Gradient Boosting method</h3>
+
+<p>This model was new to me.  I cannot go into the specifics of what makes the model work, but from what I understand it is an ensemble method that allows for gradually &quot;learning&quot; the best model.  I&#39;ve linked to a superb definition of this method <a href="http://www.quora.com/What-is-Gradient-Boosting-Models-and-Random-Forests-using-layman-terms#">here</a>.  </p>
+
+<p>Since I&#39;m unfamiliar with the model, I&#39;m going to be pretty broad with the tuning grid and let <code>train</code> pick the best model for me.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">gbmGrid <span class="o">&lt;-</span> <span class="kp">expand.grid</span><span class="p">(</span>interaction.depth <span class="o">=</span> <span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">3</span><span class="p">)</span> <span class="o">*</span> <span class="m">2</span><span class="p">,</span>
+                      n.trees <span class="o">=</span> <span class="p">(</span><span class="m">1</span><span class="o">:</span><span class="m">6</span><span class="p">)</span><span class="o">*</span><span class="m">250</span><span class="p">,</span> shrinkage <span class="o">=</span> <span class="m">.1</span><span class="p">,</span> n.minobsinnode <span class="o">=</span> <span class="m">10</span><span class="p">)</span>
+<span class="kp">set.seed</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>
+model_cv <span class="o">&lt;-</span> train<span class="p">(</span>Popular <span class="o">~</span> Section <span class="o">+</span> WordCount <span class="o">+</span> Weekday <span class="o">+</span> Hour <span class="o">+</span> Question <span class="o">+</span> Bonus <span class="o">+</span> NotBonus<span class="p">,</span> data <span class="o">=</span> train<span class="p">,</span> metric <span class="o">=</span> <span class="s">&#39;ROC&#39;</span><span class="p">,</span> method <span class="o">=</span> <span class="s">&#39;gbm&#39;</span><span class="p">,</span> tuneGrid <span class="o">=</span> gbmGrid<span class="p">,</span> 
+                  trControl <span class="o">=</span> trainControl<span class="p">(</span><span class="s">&#39;cv&#39;</span><span class="p">,</span> number <span class="o">=</span> <span class="m">5</span><span class="p">,</span> allowParallel <span class="o">=</span> <span class="bp">T</span><span class="p">,</span> classProbs <span class="o">=</span> <span class="bp">T</span><span class="p">,</span> summaryFunction <span class="o">=</span> twoClassSummary<span class="p">))</span>
+</code></pre></div><div class="highlight"><pre><code class="language-r" data-lang="r">model_cv
+</code></pre></div><div class="highlight"><pre><code class="language-text" data-lang="text">## Stochastic Gradient Boosting 
+## 
+## 6532 samples
+##   15 predictor
+##    2 classes: &#39;no&#39;, &#39;yes&#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold) 
+## 
+## Summary of sample sizes: 5225, 5226, 5225, 5226, 5226 
+## 
+## Resampling results across tuning parameters:
+## 
+##   interaction.depth  n.trees  ROC        Sens       Spec       ROC SD     
+##   2                   250     0.9325765  0.9667213  0.6029115  0.007294326
+##   2                   500     0.9344560  0.9628597  0.6367685  0.007674865
+##   2                   750     0.9342770  0.9612056  0.6495916  0.007449478
+##   2                  1000     0.9341366  0.9617574  0.6477357  0.008137925
+##   2                  1250     0.9341734  0.9612058  0.6523271  0.007813192
+##   2                  1500     0.9332999  0.9589999  0.6541620  0.008806376
+##   4                   250     0.9341907  0.9606536  0.6376817  0.006881781
+##   4                   500     0.9331252  0.9577130  0.6395208  0.007874766
+##   4                   750     0.9317527  0.9555068  0.6459218  0.008506607
+##   4                  1000     0.9300016  0.9551391  0.6450170  0.008412948
+##   4                  1250     0.9282388  0.9523818  0.6367810  0.008633019
+##   4                  1500     0.9266985  0.9523809  0.6303758  0.008231190
+##   6                   250     0.9339229  0.9606538  0.6367936  0.006858522
+##   6                   500     0.9309758  0.9566094  0.6440953  0.007486497
+##   6                   750     0.9286904  0.9533004  0.6431737  0.008177307
+##   6                  1000     0.9251800  0.9520138  0.6367601  0.007860551
+##   6                  1250     0.9234056  0.9516458  0.6431653  0.007761015
+##   6                  1500     0.9207935  0.9503583  0.6386159  0.007671433
+##   Sens SD      Spec SD   
+##   0.004970930  0.02443406
+##   0.006263708  0.02413679
+##   0.006010095  0.02179991
+##   0.006616881  0.02687704
+##   0.006383519  0.01929270
+##   0.006353768  0.02208576
+##   0.005576795  0.02060370
+##   0.008497721  0.02965727
+##   0.008105456  0.02100855
+##   0.008021189  0.02619897
+##   0.006665764  0.02085512
+##   0.007012165  0.02202656
+##   0.007733225  0.03479841
+##   0.007366771  0.03202290
+##   0.006734193  0.03120297
+##   0.008893539  0.03020820
+##   0.007758948  0.03335144
+##   0.008793118  0.02107174
+## 
+## Tuning parameter &#39;shrinkage&#39; was held constant at a value of 0.1
+## 
+## Tuning parameter &#39;n.minobsinnode&#39; was held constant at a value of 10
+## ROC was used to select the optimal model using  the largest value.
+## The final values used for the model were n.trees = 500,
+##  interaction.depth = 2, shrinkage = 0.1 and n.minobsinnode = 10.
+</code></pre></div>
+<h2>Final Submission</h2>
+
+<p>The Boosted Tree method had a stronger performance on the training data, however I was worried about over-fitting the model.  In order to protect against this, I took the predictions of both models and averaged them together.</p>
+<div class="highlight"><pre><code class="language-r" data-lang="r">test_gbm_cv_pred <span class="o">&lt;-</span> predict<span class="p">(</span>model_cv<span class="p">,</span> newdata <span class="o">=</span> test<span class="p">,</span> type <span class="o">=</span> <span class="s">&#39;prob&#39;</span><span class="p">)[,</span> <span class="m">2</span><span class="p">]</span>
+test_rf_cv_pred <span class="o">&lt;-</span> predict<span class="p">(</span>model_rf_cv<span class="p">,</span> newdata <span class="o">=</span> test<span class="p">,</span> type <span class="o">=</span> <span class="s">&#39;prob&#39;</span><span class="p">)[,</span> <span class="m">2</span><span class="p">]</span>
+
+avg <span class="o">&lt;-</span> <span class="kp">as.data.frame</span><span class="p">(</span><span class="kp">cbind</span><span class="p">(</span>test_rf_cv_pred<span class="p">,</span> test_gbm_cv_pred<span class="p">))</span>
+
+avg<span class="o">$</span>avg <span class="o">&lt;-</span> <span class="p">(</span>avg<span class="o">$</span>test_rf_cv_pred<span class="o">+</span>avg<span class="o">$</span>test_gbm_cv_pred<span class="p">)</span><span class="o">/</span><span class="m">2</span>
+MySubmission <span class="o">=</span> <span class="kt">data.frame</span><span class="p">(</span>UniqueID <span class="o">=</span> test1<span class="o">$</span>UniqueID<span class="p">,</span> Probability1 <span class="o">=</span> avg<span class="o">$</span>avg<span class="p">)</span>
+</code></pre></div>
+<h2>Results and Lessons Learned</h2>
+
+<p>I ended up scoring a .90277 AUC, which was good enough to sneak into the top 10 percent.  Through this exercise, I learned how important cross validating a model can be in machine learning.  When initially forming models, there is a strong temptation to add in as many variables as possible in order to achieve high <em>training set prediction</em> accuracy.  Don&#39;t do this! Simpler models are more likely to succeed with test set predictions.  Cross validating is an excellent way to ensure that you are not over-fitting.</p>
+
+<p>I was tempted to use a &quot;Bag of Words&quot; approach and throw in a bunch of words that showed up in the Abstract as features.  I ended up not using this approach, but rather looked for recurring series of articles, then manually added them as features.</p>
+
+<p>Lastly, I learned about a new model, Boosted Trees, which is another ensemble method that can be used for classification and regression.  If anyone is actually reading this, let me know in the comments if you have any questions, or noticed something that I could have done better!</p>
+
+</div>
+
+
+    </div>
+
+  </body>
+  
+  
+
+<div id="disqus_thread"></div>
+<script type="text/javascript">
+    /* * * CONFIGURATION VARIABLES * * */
+    var disqus_shortname = 'philliphetzel';
+    
+    /* * * DON'T EDIT BELOW THIS LINE * * */
+    (function() {
+        var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+        (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+
+  <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-62398626-1', 'auto');
+  ga('send', 'pageview');
+
+</script>
+</html>

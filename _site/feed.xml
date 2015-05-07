@@ -2,12 +2,388 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Phillip Hetzel</title>
-    <description>For those of us who were not Computer Science majors</description>
+    <description>Data analytics for those of us who were not Computer Science majors</description>
     <link>phetzel1.github.io/</link>
     <atom:link href="phetzel1.github.io/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 28 Apr 2015 22:40:05 -0400</pubDate>
-    <lastBuildDate>Tue, 28 Apr 2015 22:40:05 -0400</lastBuildDate>
+    <pubDate>Thu, 07 May 2015 06:17:58 -0400</pubDate>
+    <lastBuildDate>Thu, 07 May 2015 06:17:58 -0400</lastBuildDate>
     <generator>Jekyll v2.5.3</generator>
+    
+      <item>
+        <title>First Kaggle Competition</title>
+        <description>&lt;h2&gt;Background&lt;/h2&gt;
+
+&lt;p&gt;I&amp;#39;m currently taking an excellent course on &lt;a href=&quot;https://www.edx.org/&quot;&gt;edX.org&lt;/a&gt; called &amp;quot;The Analytics Edge,&amp;quot; taught by MIT.  The course structure helps the student learn a different statistical model every week.  For the past three weeks, the course sponsored a private &lt;a href=&quot;https://www.kaggle.com/&quot;&gt;Kaggle&lt;/a&gt; competition.  In this blog post, I will walk you through the process that I used to place in the top 10% of the competition.&lt;/p&gt;
+
+&lt;h2&gt;Purpose&lt;/h2&gt;
+
+&lt;p&gt;The competition sponsor chose to study and analyze the popularity of New York Times website articles.  The competitors were to create a model that would accurately predict whether or not an article would be popular, with popularity being defined as 25 or more comments on the article.  Let&amp;#39;s grab the data and look how it is structured.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;train1 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; read.csv&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;NYTimesBlogTrain.csv&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; stringsAsFactors &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+test1 &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; read.csv&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;NYTimesBlogTest.csv&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; stringsAsFactors &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+str&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train1&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## &amp;#39;data.frame&amp;#39;:    6532 obs. of  10 variables:
+##  $ NewsDesk      : chr  &amp;quot;Business&amp;quot; &amp;quot;Culture&amp;quot; &amp;quot;Business&amp;quot; &amp;quot;Business&amp;quot; ...
+##  $ SectionName   : chr  &amp;quot;Crosswords/Games&amp;quot; &amp;quot;Arts&amp;quot; &amp;quot;Business Day&amp;quot; &amp;quot;Business Day&amp;quot; ...
+##  $ SubsectionName: chr  &amp;quot;&amp;quot; &amp;quot;&amp;quot; &amp;quot;Dealbook&amp;quot; &amp;quot;Dealbook&amp;quot; ...
+##  $ Headline      : chr  &amp;quot;More School Daze&amp;quot; &amp;quot;New 96-Page Murakami Work Coming in December&amp;quot; &amp;quot;Public Pension Funds Stay Mum on Corporate Expats&amp;quot; &amp;quot;Boot Camp for Bankers&amp;quot; ...
+##  $ Snippet       : chr  &amp;quot;A puzzle from Ethan Cooper that reminds me that a bill is due.&amp;quot; &amp;quot;The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His&amp;quot;| __truncated__ &amp;quot;Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little&amp;quot;| __truncated__ &amp;quot;As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service &amp;quot;| __truncated__ ...
+##  $ Abstract      : chr  &amp;quot;A puzzle from Ethan Cooper that reminds me that a bill is due.&amp;quot; &amp;quot;The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His&amp;quot;| __truncated__ &amp;quot;Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little&amp;quot;| __truncated__ &amp;quot;As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service &amp;quot;| __truncated__ ...
+##  $ WordCount     : int  508 285 1211 1405 181 245 258 893 1077 188 ...
+##  $ PubDate       : chr  &amp;quot;2014-09-01 22:00:09&amp;quot; &amp;quot;2014-09-01 21:14:07&amp;quot; &amp;quot;2014-09-01 21:05:36&amp;quot; &amp;quot;2014-09-01 20:43:34&amp;quot; ...
+##  $ Popular       : int  1 0 0 1 1 1 0 1 1 0 ...
+##  $ UniqueID      : int  1 2 3 4 5 6 7 8 9 10 ...
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Now let&amp;#39;s look at the first couple of rows (the &lt;code&gt;kable&lt;/code&gt; function is just a way to make the chart prettier in HTML):&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;kable&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train1&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;table&gt;&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;NewsDesk&lt;/th&gt;
+&lt;th&gt;SectionName&lt;/th&gt;
+&lt;th&gt;SubsectionName&lt;/th&gt;
+&lt;th&gt;Headline&lt;/th&gt;
+&lt;th&gt;Snippet&lt;/th&gt;
+&lt;th&gt;Abstract&lt;/th&gt;
+&lt;th style=&quot;text-align: left&quot;&gt;WordCount&lt;/th&gt;
+&lt;th style=&quot;text-align: center&quot;&gt;PubDate&lt;/th&gt;
+&lt;th style=&quot;text-align: center&quot;&gt;Popular&lt;/th&gt;
+&lt;th style=&quot;text-align: center&quot;&gt;UniqueID&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;Business&lt;/td&gt;
+&lt;td&gt;Crosswords/Games&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;More School Daze&lt;/td&gt;
+&lt;td&gt;A puzzle from Ethan Cooper that reminds me that a bill is due.&lt;/td&gt;
+&lt;td&gt;A puzzle from Ethan Cooper that reminds me that a bill is due.&lt;/td&gt;
+&lt;td style=&quot;text-align: left&quot;&gt;508&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;2014-09-01 22:00:09&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;1&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Culture&lt;/td&gt;
+&lt;td&gt;Arts&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;New 96-Page Murakami Work Coming in December&lt;/td&gt;
+&lt;td&gt;The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His Years of Pilgrimage.&lt;/td&gt;
+&lt;td&gt;The Strange Library will arrive just three and a half months after Mr. Murakamis latest novel, Colorless Tsukuru Tazaki and His Years of Pilgrimage.&lt;/td&gt;
+&lt;td style=&quot;text-align: left&quot;&gt;285&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;2014-09-01 21:14:07&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;0&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Business&lt;/td&gt;
+&lt;td&gt;Business Day&lt;/td&gt;
+&lt;td&gt;Dealbook&lt;/td&gt;
+&lt;td&gt;Public Pension Funds Stay Mum on Corporate Expats&lt;/td&gt;
+&lt;td&gt;Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little about the strategy, which could hurt the nations tax base.&lt;/td&gt;
+&lt;td&gt;Public pension funds have major stakes in American companies moving overseas to cut their tax bills. But they are saying little about the strategy, which could hurt the nations tax base.&lt;/td&gt;
+&lt;td style=&quot;text-align: left&quot;&gt;1211&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;2014-09-01 21:05:36&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;0&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Business&lt;/td&gt;
+&lt;td&gt;Business Day&lt;/td&gt;
+&lt;td&gt;Dealbook&lt;/td&gt;
+&lt;td&gt;Boot Camp for Bankers&lt;/td&gt;
+&lt;td&gt;As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service members ideal customers.&lt;/td&gt;
+&lt;td&gt;As they struggle to find new business to bolster sluggish earnings, banks consider the nations 25 million veterans and service members ideal customers.&lt;/td&gt;
+&lt;td style=&quot;text-align: left&quot;&gt;1405&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;2014-09-01 20:43:34&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;1&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Science&lt;/td&gt;
+&lt;td&gt;Health&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;Of Little Help to Older Knees&lt;/td&gt;
+&lt;td&gt;Middle-aged and older patients are unlikely to benefit in the long term from surgery to repair tears in the meniscus, pads of cartilage in the knee, a new review of studies has found.&lt;/td&gt;
+&lt;td&gt;Middle-aged and older patients are unlikely to benefit in the long term from surgery to repair tears in the meniscus, pads of cartilage in the knee, a new review of studies has found.&lt;/td&gt;
+&lt;td style=&quot;text-align: left&quot;&gt;181&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;2014-09-01 18:58:51&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;1&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;Science&lt;/td&gt;
+&lt;td&gt;Health&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;A Benefit of Legal Marijuana&lt;/td&gt;
+&lt;td&gt;A new study has found evidence that legal access to marijuana is associated with fewer opioid overdose deaths, but researchers said their findings should not be used as the basis for the wide adoption of legalized cannabis.&lt;/td&gt;
+&lt;td&gt;A new study has found evidence that legal access to marijuana is associated with fewer opioid overdose deaths, but researchers said their findings should not be used as the basis for the wide adoption of legalized cannabis.&lt;/td&gt;
+&lt;td style=&quot;text-align: left&quot;&gt;245&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;2014-09-01 18:52:22&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;1&lt;/td&gt;
+&lt;td style=&quot;text-align: center&quot;&gt;6&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;&lt;/table&gt;
+
+&lt;h2&gt;What&amp;#39;s the Plan?&lt;/h2&gt;
+
+&lt;p&gt;Right away I had a general direction of how I wanted to make my model.  Here are some things I decided immediately:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;This is a binary classification problem.  In other words, we are going to try to predict that an article is either popular, or not popular.  &lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;I do not want to use a great deal of text analytics.  Some of my peers decided to use &amp;quot;Bag of Words&amp;quot; for feature extraction.  More on this later.&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;The data allows for time-based feature extraction (i.e. I can pull out the hour and day of an article).&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;There are many recurring series of articles, many of which are either very popular or not at all popular.&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;With these general observations in mind, I&amp;#39;m going to start adding features to this data-set to later put into a model.&lt;/p&gt;
+
+&lt;h2&gt;Adding Features (and General Maintenance)&lt;/h2&gt;
+
+&lt;p&gt;Since some of the features we will eventually put into our model are either categorical or binary, we will preprocess the training and testing data-set together.  This ensures that the training and testing set will have the same set of factors when we eventually split them apart again.  For the &lt;code&gt;complete&lt;/code&gt; data frame, we will not include the &lt;code&gt;Popular&lt;/code&gt; variable.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;complete &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;rbind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train1&lt;span class=&quot;p&quot;&gt;[,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)],&lt;/span&gt; test1&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The weekday and time an article was published may be useful in determining its popularity.  I&amp;#39;m going to separate the publish date feature into discrete &lt;code&gt;Weekday&lt;/code&gt; and &lt;code&gt;Hour&lt;/code&gt; features.  They will be stored as factors.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;PubDate &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;strptime&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;PubDate&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;%Y-%m-%d %H:%M:%S&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Weekday &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;PubDate&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;wday&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Hour &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;PubDate&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;hour&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;I have also noticed that the &lt;code&gt;NewsDesk&lt;/code&gt;, &lt;code&gt;SectionName&lt;/code&gt;, and &lt;code&gt;SubSectionName&lt;/code&gt; are not consistently filled out.  Therefore, I want to collapse these fields into one feature.  My hope is that I will be able to better group the data with a more complete set of section categories.  I use a host of &lt;code&gt;ifelse&lt;/code&gt; functions to fill in my new &lt;code&gt;Section&lt;/code&gt; feature.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;TStyle&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Style&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Styles&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Style&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Foreign&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;World&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SubsectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Education&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Education&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;National&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;U.S.&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Politics&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Science&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Health&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Health&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;OpEd&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Opinion&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Opinion&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Crosswords/Games&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Culture&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Arts&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Culture&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Technology&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Open&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Technology&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Business&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Business Day&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Business&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Travel&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Travel&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Travel&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Sports&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Sports&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Sports&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Magazine&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Magazine&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Magazine&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Multimedia&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Multimedia&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NewsDesk &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Metro&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;N.Y./Region&amp;#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;N.Y. / Region&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Metro&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;After doing some digging around the training set, I notice that headlines that ask questions seem to have a higher rate of popularity.  I introduce the &lt;code&gt;Question&lt;/code&gt; variable to capture this.  The &lt;code&gt;grepl&lt;/code&gt; function returns a &lt;code&gt;TRUE&lt;/code&gt; or &lt;code&gt;FALSE&lt;/code&gt; value if any value in the regular expression is in the headline.  For more on regular expressions, I would suggest &lt;a href=&quot;https://msdn.microsoft.com/en-us/library/az24scfc%28v=vs.110%29.aspx&quot;&gt;this link&lt;/a&gt;.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Question &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.numeric&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;grepl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;\\?|^How|^Should|^When|^Why|^What&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Headline&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; perl &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;I also want to add two new features in reference to the fourth point in the &amp;quot;What&amp;#39;s the Plan&amp;quot; section above.  I look through the data set and note which recurring articles are popular, and which are not.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;pop_headlines &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;^Readers Respond&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;^No Comment Necessary&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;^Living With Cancer&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;^Ask Well&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;^Facts&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Quandary:&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;^Think Like a Doctor&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+unpop_headlines &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;^[0-9]&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Analytics:&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Behind the Cover Story&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Big Ticket&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Book Review Podcast&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^Classical Playlist&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^CMJ 2014&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Daily Clip Report&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Daily Report&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Election 2014&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;Fashion Week&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^First Draft Focus&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^First Draft Video&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Friday Night Music&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^From The Upshot&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^In Performance&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^International Arts Events&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Joe on WNYC&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Lunchtime Laughs&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^Morning Agenda&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^New York City&amp;#39;s Week in Pictures&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^New York Parking Alert&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Pictures of the Day&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^NYTLNreads&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^On This Day&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Poetry Pairings&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Politics Helpline&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Popcast&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Q\\. and A\\.&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^Reading the Times&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Student Crossword&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Sunday Breakfast Menu&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Test Yourself&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Text to Text&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^The Daily Gift&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Throwback Thursday&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Today in Politics&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Today in Small Business&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^Toronto Festival 2014&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Tune Into The Times&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Tune In to The Times&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Under Cover&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Variety&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^Verbatim&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Video Reviews&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Walkabout&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Weekend Reading&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Weekly News Quiz&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;Weekly Wrap&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                     &lt;span class=&quot;s&quot;&gt;&amp;quot;^What We&amp;#39;re&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^What&amp;#39;s Going On&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;^Word of the Day&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Section&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;This allows me to plug these vectors into a &lt;code&gt;grepl&lt;/code&gt; command.  The &lt;code&gt;collapse&lt;/code&gt; parameter in the &lt;code&gt;paste&lt;/code&gt; command places a pipe character between each of the vector items.  The pipe character tells R to return &lt;code&gt;TRUE&lt;/code&gt; if any of the vector items are present in the headline.  The new features are called &lt;code&gt;Bonus&lt;/code&gt; and &lt;code&gt;NotBonus&lt;/code&gt;, which are simple indicator variables.  An observation will receive a 1 in the &lt;code&gt;Bonus&lt;/code&gt; variable if they are present in the &lt;code&gt;pop_headlines&lt;/code&gt; vector.  An observation will also receive a 1 in the &lt;code&gt;NotBonus&lt;/code&gt; variable if they are &lt;em&gt;not&lt;/em&gt; present in the &lt;code&gt;unpop_headlines&lt;/code&gt;.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Bonus &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;kp&quot;&gt;grepl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;paste&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;pop_headlines&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; collapse &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; fixed &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Headline&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;NotBonus &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;kp&quot;&gt;grepl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;paste&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;unpop_headlines&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; collapse &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;|&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; fixed &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Headline&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;SubsectionName &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;Asia Pacific&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;I also want to reduce the &lt;code&gt;WordCount&lt;/code&gt; to a logarithmic scale (I&amp;#39;m adding 1 to the &lt;code&gt;WordCount&lt;/code&gt; variable to protect against observations with a &lt;code&gt;WordCount&lt;/code&gt; of 0).&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;WordCount &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; complete&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;WordCount&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;That&amp;#39;s all the feature extraction we&amp;#39;ll do for this data-set; we don&amp;#39;t want to over-fit.  The last step is to split the data back into training and testing sets, then adding back the response variable.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;train &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;head&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;nrow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train1&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+test &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;tail&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;complete&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;nrow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;test1&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+train&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Popular &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; train1&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Popular
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Forming a Model&lt;/h2&gt;
+
+&lt;p&gt;I&amp;#39;m going to form three models:&lt;/p&gt;
+
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;Logistic Regression&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Random Forest&lt;/p&gt;&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Gradient Boosted Tree&lt;/p&gt;&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3&gt;Logistic Regression&lt;/h3&gt;
+
+&lt;p&gt;A logistic regression may be a decent model choice because it lends itself to binary classification problems.  We will use the &lt;code&gt;glm&lt;/code&gt; command, and use the &lt;code&gt;Section&lt;/code&gt;, &lt;code&gt;Weekday&lt;/code&gt;, &lt;code&gt;Question&lt;/code&gt;, &lt;code&gt;Bonus&lt;/code&gt;, and &lt;code&gt;NotBonus&lt;/code&gt; to predict &lt;code&gt;Popular&lt;/code&gt;.  &lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;model_glm &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; glm&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;Popular &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt; Section &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Weekday &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Question &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Bonus &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; NotBonus&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; family &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; binomial&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; data &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; train&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;Let&amp;#39;s see how this model performed on the training set.  The &lt;code&gt;response&lt;/code&gt; parameter notifies R to return probability rather than the predicted class.  For this model, we&amp;#39;ll measure the accuracy (True Negatives + True Positives / # of observations)&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;glm_pred &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; predict&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;model_glm&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; type &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;response&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+t &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;table&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Popular&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; glm_pred &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;.5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;])&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;nrow&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## [1] 0.8948255
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;That accuracy is okay, but we can do better by using more complex statistical models.&lt;/p&gt;
+
+&lt;h3&gt;Random Forest&lt;/h3&gt;
+
+&lt;p&gt;The random forest model is a strong choice for this problem because it will be able to capture non-linear relationships.  We will use the &lt;code&gt;train&lt;/code&gt; function from the &lt;code&gt;caret&lt;/code&gt; package in order to cross validate the random forest model.  The competition is scoring off of the model with the best Area Under the Curve (AUC), which is why we are using &lt;code&gt;ROC&lt;/code&gt; as our metric.  The &lt;code&gt;pROC&lt;/code&gt; package allows us to use the &lt;code&gt;ROC&lt;/code&gt; metric.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code&gt;train&lt;/code&gt; function does not like when the response variable (Popular) is numeric, so the first step is to change the values to either &amp;quot;yes&amp;quot; or &amp;quot;no.&amp;quot;  Note that using the train function classification calls for the response variable to be a factor.&lt;/p&gt;
+
+&lt;p&gt;Full disclosure: I know from previous iterations that the best &lt;code&gt;mtry&lt;/code&gt; value is in the range of 8 - 15.  Additionally in my original model, I used 10 fold cross validation with &lt;code&gt;ntree&lt;/code&gt; set at 1000.  This took a loooooooooooong time on my puny laptop, so I&amp;#39;ve purposely made the model less computationally expensive for the purpose of writing this post.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;&lt;span class=&quot;kn&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;randomForest&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;caret&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;e1071&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kn&quot;&gt;require&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;pROC&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+train&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Popular &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train1&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Popular&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+train&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Popular &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.factor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;ifelse&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;train&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;Popular &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;quot;0&amp;quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;no&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;yes&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+rfGrid &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;expand.grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;.&lt;/span&gt;mtry &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;15&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+
+&lt;span class=&quot;kp&quot;&gt;set.seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+model_rf_cv &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; train&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;Popular &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt; Question &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Bonus &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; NotBonus &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Section &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Weekday &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Hour&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; data &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; train&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; metric &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;ROC&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; method &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;rf&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                  ntree &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1000&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; nodesize &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; tuneGrid &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; rfGrid&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                  trControl &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; trainControl&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;cv&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; number &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; allowParallel &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                                           classProbs &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; summaryFunction &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; twoClassSummary&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+model_rf_cv
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## Random Forest 
+## 
+## 6532 samples
+##   15 predictor
+##    2 classes: &amp;#39;no&amp;#39;, &amp;#39;yes&amp;#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold) 
+## 
+## Summary of sample sizes: 5226, 5226, 5226, 5225, 5225 
+## 
+## Resampling results across tuning parameters:
+## 
+##   mtry  ROC        Sens       Spec       ROC SD      Sens SD   
+##    8    0.8821224  0.9571629  0.6066231  0.01077888  0.01019918
+##    9    0.8828425  0.9555083  0.6148716  0.01506417  0.01247153
+##   10    0.8828170  0.9547730  0.6075615  0.01149230  0.01233141
+##   11    0.8796088  0.9542215  0.6112103  0.01282544  0.01224512
+##   12    0.8807107  0.9529348  0.6130451  0.01158821  0.01289943
+##   13    0.8806497  0.9509125  0.6112228  0.01244417  0.01257015
+##   14    0.8804412  0.9509125  0.6121277  0.01218954  0.01216024
+##   15    0.8816241  0.9507285  0.6038959  0.01424000  0.01246921
+##   Spec SD   
+##   0.01984507
+##   0.02522791
+##   0.03101629
+##   0.02453448
+##   0.02869649
+##   0.03256856
+##   0.02642122
+##   0.02793863
+## 
+## ROC was used to select the optimal model using  the largest value.
+## The final value used for the model was mtry = 9.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;The above model takes a while to run because the function runs is performing k-fold cross validation over five folds, for eight different values of &lt;code&gt;mtry&lt;/code&gt; (&lt;code&gt;mtry&lt;/code&gt; is the number of features sampled for splitting at each node).&lt;/p&gt;
+
+&lt;h3&gt;Stochastic Gradient Boosting method&lt;/h3&gt;
+
+&lt;p&gt;This model was new to me.  I cannot go into the specifics of what makes the model work, but from what I understand it is an ensemble method that allows for gradually &amp;quot;learning&amp;quot; the best model.  I&amp;#39;ve linked to a superb definition of this method &lt;a href=&quot;http://www.quora.com/What-is-Gradient-Boosting-Models-and-Random-Forests-using-layman-terms#&quot;&gt;here&lt;/a&gt;.  &lt;/p&gt;
+
+&lt;p&gt;Since I&amp;#39;m unfamiliar with the model, I&amp;#39;m going to be pretty broad with the tuning grid and let &lt;code&gt;train&lt;/code&gt; pick the best model for me.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;gbmGrid &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;expand.grid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;interaction.depth &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+                      n.trees &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;6&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;250&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; shrinkage &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;.1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; n.minobsinnode &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;kp&quot;&gt;set.seed&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+model_cv &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; train&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;Popular &lt;span class=&quot;o&quot;&gt;~&lt;/span&gt; Section &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; WordCount &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Weekday &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Hour &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Question &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; Bonus &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; NotBonus&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; data &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; train&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; metric &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;ROC&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; method &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;gbm&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; tuneGrid &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; gbmGrid&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
+                  trControl &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; trainControl&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&amp;#39;cv&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; number &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; allowParallel &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; classProbs &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; summaryFunction &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; twoClassSummary&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;model_cv
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-text&quot; data-lang=&quot;text&quot;&gt;## Stochastic Gradient Boosting 
+## 
+## 6532 samples
+##   15 predictor
+##    2 classes: &amp;#39;no&amp;#39;, &amp;#39;yes&amp;#39; 
+## 
+## No pre-processing
+## Resampling: Cross-Validated (5 fold) 
+## 
+## Summary of sample sizes: 5225, 5226, 5225, 5226, 5226 
+## 
+## Resampling results across tuning parameters:
+## 
+##   interaction.depth  n.trees  ROC        Sens       Spec       ROC SD     
+##   2                   250     0.9325765  0.9667213  0.6029115  0.007294326
+##   2                   500     0.9344560  0.9628597  0.6367685  0.007674865
+##   2                   750     0.9342770  0.9612056  0.6495916  0.007449478
+##   2                  1000     0.9341366  0.9617574  0.6477357  0.008137925
+##   2                  1250     0.9341734  0.9612058  0.6523271  0.007813192
+##   2                  1500     0.9332999  0.9589999  0.6541620  0.008806376
+##   4                   250     0.9341907  0.9606536  0.6376817  0.006881781
+##   4                   500     0.9331252  0.9577130  0.6395208  0.007874766
+##   4                   750     0.9317527  0.9555068  0.6459218  0.008506607
+##   4                  1000     0.9300016  0.9551391  0.6450170  0.008412948
+##   4                  1250     0.9282388  0.9523818  0.6367810  0.008633019
+##   4                  1500     0.9266985  0.9523809  0.6303758  0.008231190
+##   6                   250     0.9339229  0.9606538  0.6367936  0.006858522
+##   6                   500     0.9309758  0.9566094  0.6440953  0.007486497
+##   6                   750     0.9286904  0.9533004  0.6431737  0.008177307
+##   6                  1000     0.9251800  0.9520138  0.6367601  0.007860551
+##   6                  1250     0.9234056  0.9516458  0.6431653  0.007761015
+##   6                  1500     0.9207935  0.9503583  0.6386159  0.007671433
+##   Sens SD      Spec SD   
+##   0.004970930  0.02443406
+##   0.006263708  0.02413679
+##   0.006010095  0.02179991
+##   0.006616881  0.02687704
+##   0.006383519  0.01929270
+##   0.006353768  0.02208576
+##   0.005576795  0.02060370
+##   0.008497721  0.02965727
+##   0.008105456  0.02100855
+##   0.008021189  0.02619897
+##   0.006665764  0.02085512
+##   0.007012165  0.02202656
+##   0.007733225  0.03479841
+##   0.007366771  0.03202290
+##   0.006734193  0.03120297
+##   0.008893539  0.03020820
+##   0.007758948  0.03335144
+##   0.008793118  0.02107174
+## 
+## Tuning parameter &amp;#39;shrinkage&amp;#39; was held constant at a value of 0.1
+## 
+## Tuning parameter &amp;#39;n.minobsinnode&amp;#39; was held constant at a value of 10
+## ROC was used to select the optimal model using  the largest value.
+## The final values used for the model were n.trees = 500,
+##  interaction.depth = 2, shrinkage = 0.1 and n.minobsinnode = 10.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Final Submission&lt;/h2&gt;
+
+&lt;p&gt;The Boosted Tree method had a stronger performance on the training data, however I was worried about over-fitting the model.  In order to protect against this, I took the predictions of both models and averaged them together.&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-r&quot; data-lang=&quot;r&quot;&gt;test_gbm_cv_pred &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; predict&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;model_cv&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; newdata &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; test&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; type &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;prob&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+test_rf_cv_pred &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; predict&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;model_rf_cv&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; newdata &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; test&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; type &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&amp;#39;prob&amp;#39;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)[,&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+avg &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;kp&quot;&gt;as.data.frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kp&quot;&gt;cbind&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;test_rf_cv_pred&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; test_gbm_cv_pred&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;
+
+avg&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;avg &lt;span class=&quot;o&quot;&gt;&amp;lt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;avg&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;test_rf_cv_pred&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;avg&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;test_gbm_cv_pred&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
+MySubmission &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;data.frame&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;UniqueID &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; test1&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;UniqueID&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; Probability1 &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; avg&lt;span class=&quot;o&quot;&gt;$&lt;/span&gt;avg&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h2&gt;Results and Lessons Learned&lt;/h2&gt;
+
+&lt;p&gt;I ended up scoring a .90277 AUC, which was good enough to sneak into the top 10 percent.  Through this exercise, I learned how important cross validating a model can be in machine learning.  When initially forming models, there is a strong temptation to add in as many variables as possible in order to achieve high &lt;em&gt;training set prediction&lt;/em&gt; accuracy.  Don&amp;#39;t do this! Simpler models are more likely to succeed with test set predictions.  Cross validating is an excellent way to ensure that you are not over-fitting.&lt;/p&gt;
+
+&lt;p&gt;I was tempted to use a &amp;quot;Bag of Words&amp;quot; approach and throw in a bunch of words that showed up in the Abstract as features.  I ended up not using this approach, but rather looked for recurring series of articles, then manually added them as features.&lt;/p&gt;
+
+&lt;p&gt;Lastly, I learned about a new model, Boosted Trees, which is another ensemble method that can be used for classification and regression.  If anyone is actually reading this, let me know in the comments if you have any questions, or noticed something that I could have done better!&lt;/p&gt;
+</description>
+        <pubDate>Mon, 04 May 2015 20:00:00 -0400</pubDate>
+        <link>phetzel1.github.io/posts/2015/05/04/First-Kaggle-Competition/</link>
+        <guid isPermaLink="true">phetzel1.github.io/posts/2015/05/04/First-Kaggle-Competition/</guid>
+        
+        
+        <category>posts</category>
+        
+      </item>
     
       <item>
         <title>Understanding Federal Election Data</title>
